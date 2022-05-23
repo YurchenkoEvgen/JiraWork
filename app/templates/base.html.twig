@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+    {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+    {#        {% block stylesheets %}#}
+    {#            {{ encore_entry_link_tags('app') }}#}
+    {#        {% endblock %}#}
+
+    {#        {% block javascripts %}#}
+    {#            {{ encore_entry_script_tags('app') }}#}
+    {#        {% endblock %}#}
+</head>
+<body>
+<header>
+    <a href="/">Main</a>
+    <a href="/auth">Login</a>
+    <a href="/filter">Search in jira</a>
+    <a href="/issue">Issues</a>
+    <a href="/project">Projects</a>
+</header>
+<div>
+    {% block body %}{% endblock %}
+    {% if forms is defined %}
+        {% for form in forms %}
+            <div>
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                {{ form_end(form) }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+
+<br>
+<br>
+{% if data is defined%}
+{{data}}
+{% endif %}
+</body>
+</html>
