@@ -66,7 +66,6 @@ class IssueController extends AbstractController
                 ])
                 ->setUri('issue/'.$issue->getId())
                 ->sendRequest(204);
-            dump($jiraApi);
             if ($jiraApi->isValid()) {
                 $issueRepository->add($issue, true);
             }

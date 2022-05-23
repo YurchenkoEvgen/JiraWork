@@ -111,9 +111,10 @@ class MainController extends AbstractController
                     $arrayofissue[] = new Issue($value);
                 }
 
+                $projectRepository = new ProjectRepository($managerRegistry);
+                $issueRepository = new IssueRepository($managerRegistry);
                 foreach ($arrayofissue as $issue) {
-                    $projectRepository = new ProjectRepository($managerRegistry);
-                    $issueRepository = new IssueRepository($managerRegistry);
+
                     $projectRepository->merge($issue->getProject(), true);
                     $issueRepository->merge($issue, true);
                 }

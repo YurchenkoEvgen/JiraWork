@@ -54,7 +54,6 @@ class JiraAPI
     }
 
     public function sendRequest(string $validecodes = '200') {
-        dump($this);
         $result = $this->cli->request($this->method,$this->uri,$this->arg);
         $this->responseCode = $result->getStatusCode();
 
