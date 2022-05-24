@@ -2,7 +2,7 @@
 // src/EventListener/RequestListener.php
 namespace App\EventListener;
 
-use App\DTO\ConnectionInfo;
+use App\DTO\Jira\ConnectionInfo;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 

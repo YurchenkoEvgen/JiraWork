@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO;
+namespace App\DTO\Jira;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;

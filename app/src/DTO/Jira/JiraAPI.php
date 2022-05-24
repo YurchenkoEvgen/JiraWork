@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO;
+namespace App\DTO\Jira;
 
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\HttpClient;
@@ -18,6 +18,7 @@ class JiraAPI
     protected string $responseBody;
     protected bool $isvalid;
     protected array $responseBodyInArray;
+    protected array $validcodes;
 
     public function __construct(Session $session)
     {
@@ -30,8 +31,26 @@ class JiraAPI
             ]
         ];
         $this->baseUri = $connectioninfo->getBasicuri();
+        $this->setDefaultData();
+    }
+
+    public function setDefaultData()
+    {
+        $this->responseCode = 0;
+        $this->responseBody = '';
+        $this->responseBodyInArray = [];
+        $this->isvalid = false;
         $this->method = 'GET';
         $this->setUri('/');
+        $this->validcodes = ['200'];
+        return $this;
+    }
+
+    public function clear() {
+        $this->setDefaultData();
+        $this->arg = [
+            'auth_basic'=>$this->arg['auth_basic']
+        ];
     }
 
     static function GetAPIBuilder(Session $session) {
@@ -53,12 +72,16 @@ class JiraAPI
         return $this;
     }
 
-    public function sendRequest(string $validecodes = '200') {
+    public function setValidcodes(string $validcodes) {
+        $this->validcodes = explode(',',$validcodes);
+        return $this;
+    }
+
+    public function sendRequest() {
         $result = $this->cli->request($this->method,$this->uri,$this->arg);
         $this->responseCode = $result->getStatusCode();
 
-        $validcodearray = explode(',',$validecodes);
-        $this->isvalid = in_array((string)$this->responseCode,$validcodearray);
+        $this->isvalid = in_array((string)$this->responseCode,$this->validcodes);
 
         if ($this->isvalid) {
             $this->responseBody = $result->getContent();
@@ -87,21 +110,4 @@ class JiraAPI
         return $this->responseCode;
     }
 
-    public function clearResponse()
-    {
-        $this->responseCode = null;
-        $this->responseBody = null;
-        $this->isvalid = null;
-    }
-
-    public function GetProjects() {
-        $this->setMethod('GET');
-        $this->setUri('project');
-
-        if ($this->setMethod('GET')->setUri('project')->sendRequest()->isValid()) {
-            return $this->getContentAsArray();
-        } else {
-            return null;
-        }
-    }
 }

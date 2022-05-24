@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
-use App\DTO\ConnectionInfo;
-use App\DTO\JiraAPI;
+use App\DTO\Jira\ConnectionInfo;
+use App\DTO\Jira\JiraAPI;
+use App\DTO\Jira\JiraAPIInterfacesClass;
+use App\DTO\Jira\Project\searchProject;
 use App\Entity\Issue;
-use App\Entity\Project;
 use App\Repository\IssueRepository;
 use App\Repository\ProjectRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,14 +23,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MainController extends AbstractController
 {
-    private $prefix = 'rest/api/2/';
-
     public function __construct(private ManagerRegistry $doctrine){}
 
     #[Route('/', name: 'main')]
     public function getmain(): Response {
-        $form = $this->createFormBuilder()->getForm();
 
+        $form = $this->createFormBuilder()->getForm();
         return $this->render('base.html.twig',[
             'forms' => array($form->createView()),
             'data' => 'OK'
@@ -70,9 +69,9 @@ class MainController extends AbstractController
     }
 
     #[Route('/filter', name: 'search_issue')]
-    public function search_issue(Request $request, ManagerRegistry $managerRegistry, ValidatorInterface $validator): Response {
+    public function search_issue(Request $request, ManagerRegistry $managerRegistry): Response {
         $JiraAPI = JiraAPI::GetAPIBuilder($request->getSession());
-        $data = $JiraAPI->GetProjects();
+        $data = searchProject::getInterface($JiraAPI)->getData(false);
         $projects = ['Choice'=>null] + array_combine(array_column($data,'name'),array_column($data,'id'));
 
         $form = $this->createFormBuilder()
@@ -135,5 +134,20 @@ class MainController extends AbstractController
             ]
         ]);
 
+    }
+
+    #[Route('/test', name: 'test')]
+    public function test(Request $request) {
+        $j = new JiraAPI($request->getSession());
+        $j->setUri('/test');
+        $t = new JiraAPIInterfacesClass($j);
+        $j->setMethod('POST');
+        $t2 = new JiraAPIInterfacesClass($j);
+        dump($t);
+        dump($t2);
+        return $this->render('base.html.twig',[
+            'data'=>'OK',
+            'forms'=>[]
+        ]);
     }
 }

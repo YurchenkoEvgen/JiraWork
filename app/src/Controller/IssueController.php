@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\DTO\JiraAPI;
+use App\DTO\Jira\JiraAPI;
 use App\Entity\Issue;
 use App\Form\IssueType;
 use App\Repository\IssueRepository;
@@ -65,7 +65,8 @@ class IssueController extends AbstractController
                     ]
                 ])
                 ->setUri('issue/'.$issue->getId())
-                ->sendRequest(204);
+                ->setValidcodes('204')
+                ->sendRequest();
             if ($jiraApi->isValid()) {
                 $issueRepository->add($issue, true);
             }
