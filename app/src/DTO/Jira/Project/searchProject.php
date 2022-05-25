@@ -9,20 +9,25 @@ use App\Entity\Project;
 class searchProject extends JiraAPIInterfacesClass implements JiraAPIInterface
 {
 
-    public function getData(bool $returnObject = true)
+    public function getData(bool $returnObject = true):array
     {
-        $this->jiraAPI->setUri('project/search');
-        $this->sendRequest();
         $return = [];
-        if ($this->isValid) {
-            if ($returnObject) {
-                foreach ($this->resultArray['values'] as $value){
-                    $project = new Project();
-                    $project->setId($value['id'])->setName('name');
-                    $return[] = $project;
-                }
-            } else {
-                $return = $this->resultArray['values'];
+
+        $this->jiraAPI->setUri('project/search');
+        if ($this->sendRequest()->isValid) {
+            foreach ($this->resultArray['values'] as $value) {
+                $return[] = new Project($value);
+            }
+        } else {
+            switch ($this->resultCode) {
+                case 400:
+                    $this->addError('Request is not valid.');
+                    break;
+                case 404:
+                    $this->addError('No projects matching the search criteria are found');
+                    break;
+                default:
+                    $this->defaultError($this->resultCode);
             }
         }
         return $return;

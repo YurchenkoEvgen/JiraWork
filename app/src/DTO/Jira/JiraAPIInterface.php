@@ -4,5 +4,5 @@ namespace App\DTO\Jira;
 
 interface JiraAPIInterface
 {
-    public function getData(bool $returnObject = false);
+    public function getData();
 }
