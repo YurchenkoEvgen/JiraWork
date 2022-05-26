@@ -88,13 +88,13 @@ class MainController extends AbstractController
 
             $search = searchIssue::getInterface($JiraAPI);
             if (isset($data['label'])) {
-                $search->addOption('jql',"labels = '".$data['label']."'");
+                $search->addFilter("labels = '".$data['label']."'");
             }
             if (isset($data['customlabel'])){
-                $search->addOption('jql', 'cf[10032] = '."'".$data['customlabel']."'", 'AND');
+                $search->addFilter('cf[10032] = '."'".$data['customlabel']."'");
             }
             if (isset($data['project'])) {
-                $search->addOption('jql','project = '.$data['project'], 'AND');
+                $search->addFilter('project = '.$data['project']);
             }
             $projectRepository = new ProjectRepository($managerRegistry);
             $issueRepository = new IssueRepository($managerRegistry);

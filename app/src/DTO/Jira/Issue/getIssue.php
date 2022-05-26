@@ -24,7 +24,7 @@ class getIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\DTO\
                         $this->addError('The issue is not found or the user does not have permission to view it.');
                         break;
                     default:
-                        $this->defaultError($this->resultCode);
+                        $this->defaultError();
                 }
             }
         }

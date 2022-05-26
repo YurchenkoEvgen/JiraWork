@@ -80,4 +80,12 @@ class Issue
     {
         return $this->summary. ' ('. $this->id.')';
     }
+
+    public function getJiraArray():array
+    {
+        return [
+            'summary' => $this->summary,
+            'description' => $this->description
+        ];
+    }
 }

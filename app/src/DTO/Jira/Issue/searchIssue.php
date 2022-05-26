@@ -22,10 +22,14 @@ class searchIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\D
                     $this->addError('JQL query is invalid');
                     break;
                 default:
-                    $this->defaultError($this->resultCode);
+                    $this->defaultError();
             }
         }
 
         return $returned;
+    }
+
+    public function addFilter (string $condition, string $type = 'AND'):self {
+        return $this->addOption('jql', $condition, $type);
     }
 }

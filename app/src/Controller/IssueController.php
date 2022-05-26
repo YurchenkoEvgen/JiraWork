@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\DTO\Jira\JiraAPI;
+use App\DTO\Jira\Issue\deleteIssue;
+use App\DTO\Jira\Issue\editIssue;
 use App\Entity\Issue;
 use App\Form\IssueType;
 use App\Repository\IssueRepository;
@@ -56,22 +57,10 @@ class IssueController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $jiraApi = JiraAPI::GetAPIBuilder($request->getSession());
-            $jiraApi->setMethod('PUT')
-                ->setJson([
-                    'fields' =>[
-                        'summary'=>$issue->getSummary(),
-                        'description'=>$issue->getDescription()
-                    ]
-                ])
-                ->setUri('issue/'.$issue->getId())
-                ->setValidcodes('204')
-                ->sendRequest();
-            if ($jiraApi->isValid()) {
-                $issueRepository->add($issue, true);
+            if (editIssue::getInterfaceSingle($request->getSession())->setIssue($issue)->getData()) {
+                $issueRepository->add($issue,true);
+                return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
             }
-
-//            return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('issue/edit.html.twig', [
@@ -83,10 +72,19 @@ class IssueController extends AbstractController
     #[Route('/{id}', name: 'app_issue_delete', methods: ['POST'])]
     public function delete(Request $request, Issue $issue, IssueRepository $issueRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$issue->getId(), $request->request->get('_token'))) {
-            $issueRepository->remove($issue, true);
+        if ($this->isCsrfTokenValid('delete' . $issue->getId(), $request->request->get('_token'))) {
+            $delete = deleteIssue::getInterfaceSingle($request->getSession())->setIssue($issue);
+            if ($delete->getData()) {
+                $issueRepository->remove($issue, true);
+                return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                dump($delete->getError());
+            }
         }
-
-        return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
+        $form = $this->createForm(IssueType::class, $issue);
+        return $this->renderForm('issue/edit.html.twig', [
+            'issue' => $issue,
+            'form' => $form,
+        ]);
     }
 }

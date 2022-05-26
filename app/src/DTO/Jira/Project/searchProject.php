@@ -27,7 +27,7 @@ class searchProject extends JiraAPIInterfacesClass implements JiraAPIInterface
                     $this->addError('No projects matching the search criteria are found');
                     break;
                 default:
-                    $this->defaultError($this->resultCode);
+                    $this->defaultError();
             }
         }
         return $return;

@@ -25,7 +25,7 @@ class getProject extends JiraAPIInterfacesClass implements JiraAPIInterface
                         $this->addError('The project is not found or the user does not have permission to view it');
                         break;
                     default:
-                        $this->defaultError($this->resultCode);
+                        $this->defaultError();
                 }
             }
         }
