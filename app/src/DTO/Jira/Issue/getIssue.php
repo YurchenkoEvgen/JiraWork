@@ -2,9 +2,10 @@
 
 namespace App\DTO\Jira\Issue;
 
+use App\DTO\Jira\JiraApiCore;
 use App\Entity\Issue;
 
-class getIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\DTO\Jira\JiraAPIInterface
+class getIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
 {
     protected string $id;
 
@@ -15,11 +16,11 @@ class getIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\DTO\
         if (empty($this->id)){
             $this->addError('Not set ID ');
         } else {
-            $this->jiraAPI->setUri('issue/'.$this->id);
-            if ($this->sendRequest()->isValid) {
-                $returned = new Issue($this->resultArray);
+            $this->setUri('issue/'.$this->id);
+            if ($this->sendRequest()) {
+                $returned = new Issue($this->getArray());
             } else {
-                switch ($this->resultCode) {
+                switch ($this->getResponseCode()) {
                     case 404:
                         $this->addError('The issue is not found or the user does not have permission to view it.');
                         break;

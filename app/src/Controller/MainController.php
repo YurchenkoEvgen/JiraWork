@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\DTO\Jira\ConnectionInfo;
 use App\DTO\Jira\Issue\searchIssue;
-use App\DTO\Jira\JiraAPI;
 use App\DTO\Jira\Project\searchProject;
 use App\Repository\IssueRepository;
 use App\Repository\ProjectRepository;
@@ -50,7 +49,8 @@ class MainController extends AbstractController
             $request->getSession()->set('auth_token', $data['token']);
             $request->getSession()->set('auth_url', $data['url']);
         }
-        $con = new ConnectionInfo($request->getSession());
+
+        $con = ConnectionInfo::getByRequest($request);
         $authredirecturi = $request->getSession()->get('authredirecturi');
         if ($con->isValid() && !empty($authredirecturi)) {
             $request->getSession()->remove('authredirecturi');
@@ -66,8 +66,9 @@ class MainController extends AbstractController
 
     #[Route('/filter', name: 'search_issue')]
     public function search_issue_new(Request $request, ManagerRegistry $managerRegistry): Response {
-        $JiraAPI = JiraAPI::GetAPIBuilder($request->getSession());
-        $data = searchProject::getInterface($JiraAPI)->getData();
+        $connection = ConnectionInfo::getByRequest($request);
+        $search = searchProject::getInterface($connection);
+        $data = $search->getData();
         $projects = ['Choice'=>null];
         foreach ($data as $value) {
             $projects[$value->getName()] = $value->getId();
@@ -86,7 +87,7 @@ class MainController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
-            $search = searchIssue::getInterface($JiraAPI);
+            $search = searchIssue::getInterface($connection);
             if (isset($data['label'])) {
                 $search->addFilter("labels = '".$data['label']."'");
             }
@@ -98,7 +99,7 @@ class MainController extends AbstractController
             }
             $projectRepository = new ProjectRepository($managerRegistry);
             $issueRepository = new IssueRepository($managerRegistry);
-            $data = $search->sendRequest()->getData();
+            $data = $search->getData();
             foreach ($data as $issue) {
                 $projectRepository->merge($issue->getProject(), true);
                 $issueRepository->merge($issue, true);

@@ -2,24 +2,24 @@
 
 namespace App\DTO\Jira\Project;
 
-use App\DTO\Jira\JiraAPIInterface;
-use App\DTO\Jira\JiraAPIInterfacesClass;
+use App\DTO\Jira\JiraApiCore;
+use App\DTO\Jira\JiraAPIInterface;;
 use App\Entity\Project;
 
-class searchProject extends JiraAPIInterfacesClass implements JiraAPIInterface
+class searchProject extends JiraApiCore implements JiraAPIInterface
 {
 
-    public function getData(bool $returnObject = true):array
+    public function getData():array
     {
         $return = [];
 
-        $this->jiraAPI->setUri('project/search');
-        if ($this->sendRequest()->isValid) {
-            foreach ($this->resultArray['values'] as $value) {
+        $this->setUri('project/search');
+        if ($this->sendRequest()) {
+            foreach ($this->getArray()['values'] as $value) {
                 $return[] = new Project($value);
             }
         } else {
-            switch ($this->resultCode) {
+            switch ($this->getResponseCode()) {
                 case 400:
                     $this->addError('Request is not valid.');
                     break;

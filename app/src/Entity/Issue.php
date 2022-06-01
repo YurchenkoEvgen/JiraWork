@@ -40,6 +40,12 @@ class Issue
         return $this->id;
     }
 
+    public function setId($id):self
+    {
+        $this->id = $id;
+        return $this;
+    }
+
     public function getSummary(): ?string
     {
         return $this->summary;

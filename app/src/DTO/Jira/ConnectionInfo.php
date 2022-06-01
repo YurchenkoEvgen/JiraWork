@@ -2,6 +2,7 @@
 
 namespace App\DTO\Jira;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
@@ -28,12 +29,22 @@ class ConnectionInfo
 
     private const prefix = 'rest/api/2/';
 
-    public function __construct(Session $session)
+    public function __construct(?string $email, ?string $token, ?string $url)
     {
-        $this->email = $session->get('auth_email');
-        $this->token = $session->get('auth_token');
-        $this->url = $session->get('auth_url');
+        $this->email = $email;
+        $this->token = $token;
+        $this->url = $url;
         $this->basicuri = $this->url.$this::prefix;
+    }
+
+    public static function getByRequest(Request $request):self
+    {
+        $session = $request->getSession();
+        return new self(
+            $session->get('auth_email'),
+            $session->get('auth_token'),
+            $session->get('auth_url')
+        );
     }
 
     public function isValid(): bool

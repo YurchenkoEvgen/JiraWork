@@ -2,22 +2,25 @@
 
 namespace App\DTO\Jira\Issue;
 
+use App\DTO\Jira\JiraApiCore;
 use App\Entity\Issue;
 
-class searchIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\DTO\Jira\JiraAPIInterface
+class searchIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
 {
 
     public function getData():array
     {
         $returned = [];
 
-        $this->jiraAPI->setUri('search')->setMethod('POST');
-        if ($this->sendRequest()->isValid) {
-            foreach ($this->resultArray['issues'] as $value) {
+        $this
+            ->setUri('search')
+            ->setMethod('POST');
+        if ($this->sendRequest()) {
+            foreach ($this->getArray()['issues'] as $value) {
                 $returned[] = new Issue($value);
             }
         } else {
-            switch ($this->resultCode) {
+            switch ($this->getResponseCode()) {
                 case 400:
                     $this->addError('JQL query is invalid');
                     break;

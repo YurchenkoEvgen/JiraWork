@@ -2,9 +2,10 @@
 
 namespace App\DTO\Jira\Issue;
 
+use App\DTO\Jira\JiraApiCore;
 use App\Entity\Issue;
 
-class deleteIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\DTO\Jira\JiraAPIInterface
+class deleteIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
 {
     private Issue $issue;
 
@@ -15,14 +16,14 @@ class deleteIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\D
         if (empty($this->issue->getId())) {
             $this->addError('No set ID');
         } else {
-            $this->jiraAPI
+            $this
                 ->setUri('issue/'.$this->issue->getId())
                 ->setMethod('DELETE')
                 ->setValidcodes('204');
-            if ($this->sendRequest()->isValid) {
+            if ($this->sendRequest()) {
                 $returned = true;
             } else {
-                switch ($this->resultCode) {
+                switch ($this->getResponseCode()) {
                     case 400:
                         $this->addError('The issue has subtasks and deleteSubtasks is not set to true.');
                         break;

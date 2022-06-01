@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\DTO\Jira\ConnectionInfo;
+use App\DTO\Jira\Issue\createIssue;
 use App\DTO\Jira\Issue\deleteIssue;
 use App\DTO\Jira\Issue\editIssue;
 use App\Entity\Issue;
@@ -31,9 +33,14 @@ class IssueController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $issueRepository->add($issue, true);
-
-            return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
+            $new = createIssue::getInterface(ConnectionInfo::getByRequest($request))->setIssue($issue);
+            $issue = $new->getData();
+            if ($new->isValid()) {
+                $issueRepository->add($issue, true);
+                return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                dump($new->getError());
+            }
         }
 
         return $this->renderForm('issue/new.html.twig', [
@@ -57,9 +64,12 @@ class IssueController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (editIssue::getInterfaceSingle($request->getSession())->setIssue($issue)->getData()) {
+            $edit = editIssue::getInterface(ConnectionInfo::getByRequest($request))->setIssue($issue);
+            if ($edit->getData()) {
                 $issueRepository->add($issue,true);
                 return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
+            } else {
+                dump($edit);
             }
         }
 
@@ -73,7 +83,7 @@ class IssueController extends AbstractController
     public function delete(Request $request, Issue $issue, IssueRepository $issueRepository): Response
     {
         if ($this->isCsrfTokenValid('delete' . $issue->getId(), $request->request->get('_token'))) {
-            $delete = deleteIssue::getInterfaceSingle($request->getSession())->setIssue($issue);
+            $delete = deleteIssue::getInterface(ConnectionInfo::getByRequest($request))->setIssue($issue);
             if ($delete->getData()) {
                 $issueRepository->remove($issue, true);
                 return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);

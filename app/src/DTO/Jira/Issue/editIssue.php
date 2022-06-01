@@ -2,9 +2,10 @@
 
 namespace App\DTO\Jira\Issue;
 
+use App\DTO\Jira\JiraApiCore;
 use App\Entity\Issue;
 
-class editIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\DTO\Jira\JiraAPIInterface
+class editIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
 {
     private Issue $issue;
 
@@ -14,15 +15,15 @@ class editIssue extends \App\DTO\Jira\JiraAPIInterfacesClass implements \App\DTO
         if (empty($this->issue->getId())) {
             $this->addError('Not set the Issue');
         } else {
-            $this->jiraAPI
+            $this
                 ->setMethod('PUT')
                 ->setUri('issue/'.$this->issue->getId())
-                ->setValidcodes('204');
-            $this->addOption('fields',$this->issue->getJiraArray());
-            if ($this->sendRequest()->isValid) {
+                ->setValidcodes('204')
+                ->addOption('fields',$this->issue->getJiraArray());
+            if ($this->sendRequest()) {
                 $returned = true;
             } else {
-                switch ($this->resultCode) {
+                switch ($this->getResponseCode()) {
                     case 400:
                         $this->addError("The request body is missing.
 The user does not have the necessary permission to edit one or more fields.

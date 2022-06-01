@@ -2,11 +2,11 @@
 
 namespace App\DTO\Project;
 
+use App\DTO\Jira\JiraApiCore;
 use App\DTO\Jira\JiraAPIInterface;
-use App\DTO\Jira\JiraAPIInterfacesClass;
 use App\Entity\Project;
 
-class getProject extends JiraAPIInterfacesClass implements JiraAPIInterface
+class getProject extends JiraApiCore implements JiraAPIInterface
 {
     private string $id;
 
@@ -16,11 +16,11 @@ class getProject extends JiraAPIInterfacesClass implements JiraAPIInterface
         if (empty($this->id)) {
             $this->addError('No set ID project');
         } else {
-            $this->jiraAPI->setUri('project/'.$this->id);
-            if ($this->sendRequest()->isValid) {
-                $returned = new Project($this->resultArray);
+            $this->setUri('project/'.$this->id);
+            if ($this->sendRequest()) {
+                $returned = new Project($this->getArray());
             } else {
-                switch ($this->resultCode) {
+                switch ($this->getResponseCode()) {
                     case 404:
                         $this->addError('The project is not found or the user does not have permission to view it');
                         break;
