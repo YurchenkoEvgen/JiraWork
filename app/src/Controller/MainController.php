@@ -6,7 +6,6 @@ use App\DTO\Jira\ConnectionInfo;
 use App\DTO\Jira\Issue\searchIssue;
 use App\DTO\Jira\Project\searchProject;
 use App\Repository\IssueRepository;
-use App\Repository\ProjectRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -97,17 +96,15 @@ class MainController extends AbstractController
             if (isset($data['project'])) {
                 $search->addFilter('project = '.$data['project']);
             }
-            $projectRepository = new ProjectRepository($managerRegistry);
             $issueRepository = new IssueRepository($managerRegistry);
             $data = $search->getData();
             foreach ($data as $issue) {
-                $projectRepository->merge($issue->getProject(), true);
                 $issueRepository->merge($issue, true);
             }
 
             return $this->render('issue/index.html.twig', [
                 'issues' => $data,
-                'data' => print_r($data, true),
+                'data' => '',
                 'forms' => [
                     $form->createView()
                 ]

@@ -5,10 +5,12 @@ WORKDIR '/app'
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y git unzip mc nano
-#RUN apt-get install -y npm
 
 # MySQL
 RUN docker-php-ext-install pdo pdo_mysql
+# INTL
+RUN apt-get install -y libicu-dev
+RUN docker-php-ext-install intl
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer

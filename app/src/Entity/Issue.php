@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Issue
 {
     #[ORM\Id]
-//    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
@@ -19,7 +18,7 @@ class Issue
     #[ORM\Column(type: 'string', length: 2048, nullable: true)]
     private $description;
 
-    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 

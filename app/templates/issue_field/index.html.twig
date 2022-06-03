@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IssueField index{% endblock %}
+
+{% block body %}
+    <h1>IssueField index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>_key</th>
+                <th>Name</th>
+                <th>Custom</th>
+                <th>Project</th>
+                <th>clauseNames</th>
+                <th>Type</th>
+                <th>actions</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+        {% for issue_field in issue_fields %}
+            <tr>
+                <td>{{ issue_field.id }}</td>
+                <td>{{ issue_field.key }}</td>
+                <td>{{ issue_field.name }}</td>
+                <td>{{ issue_field.custom ? 'Yes' : 'No' }}</td>
+                <td>{{ issue_field.project}}</td>
+                <td>{{ issue_field.clauseNames}}</td>
+                <td>{{ issue_field.type}}</td>
+                <td>
+                    <a href="{{ path('app_issue_field_show', {'id': issue_field.id}) }}">show</a>
+                    <a href="{{ path('app_issue_field_edit', {'id': issue_field.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_issue_field_new') }}">Create new</a>
+{% endblock %}
