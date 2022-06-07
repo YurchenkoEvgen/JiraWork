@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\IssueRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
@@ -18,7 +20,7 @@ class Issue
     #[ORM\Column(type: 'string', length: 2048, nullable: true)]
     private $description;
 
-    #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist','merge'])]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 

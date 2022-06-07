@@ -29,7 +29,6 @@ final class Version20220520123303 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE issue DROP FOREIGN KEY FK_12AD233E166D1F9C');
         $this->addSql('DROP TABLE issue');
         $this->addSql('DROP TABLE project');
         $this->addSql('DROP TABLE messenger_messages');

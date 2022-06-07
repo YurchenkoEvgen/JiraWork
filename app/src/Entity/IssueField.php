@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\IssueFieldRepository;
 use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IssueFieldRepository::class)]
@@ -123,6 +125,8 @@ class IssueField
             }
         } elseif ($this->name == 'parent') {
             $this->type = 'IssueField';
+        } else {
+            $this->type = '';
         }
 
         if (key_exists('scope',$data) && $data['scope']['type'] == 'PROJECT') {

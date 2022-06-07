@@ -99,8 +99,9 @@ class MainController extends AbstractController
             $issueRepository = new IssueRepository($managerRegistry);
             $data = $search->getData();
             foreach ($data as $issue) {
-                $issueRepository->merge($issue, true);
+                $issueRepository->merge($issue);
             }
+            $issueRepository->flush();
 
             return $this->render('issue/index.html.twig', [
                 'issues' => $data,

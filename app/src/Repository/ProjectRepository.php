@@ -41,11 +41,7 @@ class ProjectRepository extends ServiceEntityRepository
 
     public function merge(Project $entity, bool $flush = false): void
     {
-        if ($this->find($entity->getId())){
-            $this->getEntityManager()->merge($entity);
-        } else {
-            $this->getEntityManager()->persist($entity);
-        }
+        $this->getEntityManager()->merge($entity);
 
         if ($flush) {
             $this->getEntityManager()->flush();
