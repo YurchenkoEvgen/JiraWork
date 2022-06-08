@@ -72,6 +72,9 @@ class IssueController extends AbstractController
                 dump($edit);
             }
         }
+        foreach ($issue->getIssueFieldValues()->getValues() as $value) {
+            dump($value->getValue());
+        }
 
         return $this->renderForm('issue/edit.html.twig', [
             'issue' => $issue,

@@ -34,6 +34,17 @@ class IssueField
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $type;
 
+    #[ORM\OneToMany(mappedBy: 'issueFiled', targetEntity: IssueFieldValue::class, orphanRemoval: true)]
+    private $issueFieldValues;
+
+    #[ORM\Column(type: 'boolean', nullable: false)]
+    private bool $isArray = false;
+
+    public function __construct()
+    {
+        $this->issueFieldValues = new ArrayCollection();
+    }
+
     public function getId(): ?string
     {
         return $this->id;
@@ -111,6 +122,17 @@ class IssueField
         return $this->clauseNames;
     }
 
+    public function getIsArray():bool
+    {
+        return $this->isArray;
+    }
+
+    public function setIsArray(bool $isArray):self
+    {
+        $this->isArray = $isArray;
+        return $this;
+    }
+
     public function fillFromJira(array $data, ProjectRepository $projectRepository):self
     {
         $this->id = $data['id'];
@@ -121,7 +143,8 @@ class IssueField
         if (key_exists('schema',$data)){
             $this->type = $data['schema']['type'];
             if ($this->type == 'array') {
-                $this->type .=':'.$data['schema']['items'];
+                $this->isArray = true;
+                $this->type =$data['schema']['items'];
             }
         } elseif ($this->name == 'parent') {
             $this->type = 'IssueField';
@@ -143,6 +166,36 @@ class IssueField
     public function setType(string $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, IssueFieldValue>
+     */
+    public function getIssueFieldValues(): Collection
+    {
+        return $this->issueFieldValues;
+    }
+
+    public function addIssueFieldValue(IssueFieldValue $issueFieldValue): self
+    {
+        if (!$this->issueFieldValues->contains($issueFieldValue)) {
+            $this->issueFieldValues[] = $issueFieldValue;
+            $issueFieldValue->setIssueFiled($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIssueFieldValue(IssueFieldValue $issueFieldValue): self
+    {
+        if ($this->issueFieldValues->removeElement($issueFieldValue)) {
+            // set the owning side to null (unless already changed)
+            if ($issueFieldValue->getIssueFiled() === $this) {
+                $issueFieldValue->setIssueFiled(null);
+            }
+        }
+
         return $this;
     }
 }

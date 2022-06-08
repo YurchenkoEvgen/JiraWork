@@ -24,6 +24,9 @@ class Issue
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
+    #[ORM\OneToMany(mappedBy: 'issue', targetEntity: IssueFieldValue::class, orphanRemoval: true)]
+    private $issueFieldValues;
+
     public function __construct($data = null)
     {
         if (isset($data)) {
@@ -34,6 +37,7 @@ class Issue
                 $this->project = new Project($data['fields']['project']);
             }
         }
+        $this->issueFieldValues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -94,5 +98,35 @@ class Issue
             'summary' => $this->summary,
             'description' => $this->description
         ];
+    }
+
+    /**
+     * @return Collection<int, IssueFieldValue>
+     */
+    public function getIssueFieldValues(): Collection
+    {
+        return $this->issueFieldValues;
+    }
+
+    public function addIssueFieldValue(IssueFieldValue $issueFieldValue): self
+    {
+        if (!$this->issueFieldValues->contains($issueFieldValue)) {
+            $this->issueFieldValues[] = $issueFieldValue;
+            $issueFieldValue->setIssue($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIssueFieldValue(IssueFieldValue $issueFieldValue): self
+    {
+        if ($this->issueFieldValues->removeElement($issueFieldValue)) {
+            // set the owning side to null (unless already changed)
+            if ($issueFieldValue->getIssue() === $this) {
+                $issueFieldValue->setIssue(null);
+            }
+        }
+
+        return $this;
     }
 }

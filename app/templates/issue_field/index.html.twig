@@ -15,6 +15,7 @@
                 <th>Project</th>
                 <th>clauseNames</th>
                 <th>Type</th>
+                <th>isArray</th>
                 <th>actions</th>
 
 
@@ -30,6 +31,7 @@
                 <td>{{ issue_field.project}}</td>
                 <td>{{ issue_field.clauseNames}}</td>
                 <td>{{ issue_field.type}}</td>
+                <td>{{ issue_field.isArray?'Yes':'No'}}</td>
                 <td>
                     <a href="{{ path('app_issue_field_show', {'id': issue_field.id}) }}">show</a>
                     <a href="{{ path('app_issue_field_edit', {'id': issue_field.id}) }}">edit</a>
