@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
@@ -17,6 +18,7 @@ class User
     private $accountId;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Assert\Email]
     private $emailAddress;
 
     #[ORM\Column(type: 'string', length: 255)]

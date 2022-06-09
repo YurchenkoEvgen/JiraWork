@@ -136,4 +136,9 @@ class IssueFieldValue
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->issueFiled.'_'.$this->issue;
+    }
 }

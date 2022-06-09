@@ -13,7 +13,6 @@ class IssueType extends AbstractType
     {
         $builder
             ->add('summary')
-            ->add('description')
             ->add('project')
         ;
     }

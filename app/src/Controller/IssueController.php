@@ -62,7 +62,6 @@ class IssueController extends AbstractController
     {
         $form = $this->createForm(IssueType::class, $issue);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $edit = editIssue::getInterface(ConnectionInfo::getByRequest($request))->setIssue($issue);
             if ($edit->getData()) {
@@ -72,10 +71,6 @@ class IssueController extends AbstractController
                 dump($edit);
             }
         }
-        foreach ($issue->getIssueFieldValues()->getValues() as $value) {
-            dump($value->getValue());
-        }
-
         return $this->renderForm('issue/edit.html.twig', [
             'issue' => $issue,
             'form' => $form,

@@ -4,6 +4,7 @@ services:
     build: .docker/php
     volumes:
       - ./app:/app
+      - ./.docker/php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
     depends_on:
       - mysql
 

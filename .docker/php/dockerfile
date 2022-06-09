@@ -4,13 +4,25 @@ WORKDIR '/app'
 # Install selected extensions and other stuff
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get install -y git unzip mc nano
+RUN apt-get install -y git unzip mc nano libicu-dev
 
-# MySQL
-RUN docker-php-ext-install pdo pdo_mysql
-# INTL
-RUN apt-get install -y libicu-dev
-RUN docker-php-ext-install intl
+# PHP Extention
+RUN docker-php-ext-install pdo pdo_mysql intl
+
+# Xdebug
+RUN yes | pecl install xdebug \
+    && echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_autostart=off" >> /usr/local/etc/php/conf.d/xdebug.ini
+
+#INSTALL APCU
+RUN pecl install apcu && docker-php-ext-enable apcu
+RUN echo "extension=apcu.so" > /usr/local/etc/php/php.ini
+RUN echo "apc.enable_cli=1" > /usr/local/etc/php/php.ini
+RUN echo "apc.enable=1" > /usr/local/etc/php/php.ini
+
+#PHP OPcache
+RUN docker-php-ext-install opcache
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer

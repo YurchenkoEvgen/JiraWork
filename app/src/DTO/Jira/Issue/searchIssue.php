@@ -17,7 +17,9 @@ class searchIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
             ->setMethod('POST');
         if ($this->sendRequest()) {
             foreach ($this->getArray()['issues'] as $value) {
-                $returned[] = new Issue($value);
+                $issue = new Issue();
+                $issue->importFromJira($value);
+                $returned[] = $issue;
             }
         } else {
             switch ($this->getResponseCode()) {

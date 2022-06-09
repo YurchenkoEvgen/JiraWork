@@ -6,19 +6,24 @@ use App\Repository\IssueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
 class Issue
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
+
+    #[ORM\Column(type: 'string', length: 20)]
+    private string $_key;
+
+    #[ORM\Column(type: 'string', length: 1024)]
+    #[Assert\Url]
+    private string $_self;
 
     #[ORM\Column(type: 'string', length: 255)]
     private $summary;
-
-    #[ORM\Column(type: 'string', length: 2048, nullable: true)]
-    private $description;
 
     #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist','merge'])]
     #[ORM\JoinColumn(nullable: false)]
@@ -27,27 +32,41 @@ class Issue
     #[ORM\OneToMany(mappedBy: 'issue', targetEntity: IssueFieldValue::class, orphanRemoval: true)]
     private $issueFieldValues;
 
-    public function __construct($data = null)
+    public function __construct()
     {
-        if (isset($data)) {
-            if (is_array($data)) {
-                $this->id=$data['id'];
-                $this->summary=$data['fields']['summary'];
-                $this->description = $data['fields']['description'];
-                $this->project = new Project($data['fields']['project']);
-            }
-        }
         $this->issueFieldValues = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setId($id):self
+    public function setId(int $id):self
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function get_key():string
+    {
+        return $this->_key;
+    }
+
+    public function set_key(string $key):self
+    {
+        $this->_key = $key;
+        return $this;
+    }
+
+    public function get_self():string
+    {
+        return $this->_self;
+    }
+
+    public function set_self(string $uri):self
+    {
+        $this->_self = $uri;
         return $this;
     }
 
@@ -59,18 +78,6 @@ class Issue
     public function setSummary(string $summary): self
     {
         $this->summary = $summary;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
 
         return $this;
     }
@@ -89,14 +96,30 @@ class Issue
 
     public function __toString(): string
     {
-        return $this->summary. ' ('. $this->id.')';
+        return $this->getSummary(). ' ('. $this->id.')';
+    }
+
+    public function importFromJira(array $data):self
+    {
+        if (
+            empty(array_diff_key(array_fill_keys(['id','self','key','fields'],null),$data)) &&
+            is_array($data['fields']) &&
+            empty(array_diff_key(array_fill_keys(['summary','project'],null),$data['fields']))
+        ) {
+            $this->id = $data['id'];
+            $this->_self = $data['self'];
+            $this->_key = $data['key'];
+            $this->summary = $data['fields']['summary'];
+            $this->project = new Project($data['fields']['project']);
+        }
+
+        return $this;
     }
 
     public function getJiraArray():array
     {
         return [
             'summary' => $this->summary,
-            'description' => $this->description
         ];
     }
 
