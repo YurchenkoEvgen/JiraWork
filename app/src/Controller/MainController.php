@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\DTO\Jira\ConnectionInfo;
 use App\DTO\Jira\Issue\searchIssue;
 use App\DTO\Jira\Project\searchProject;
+use App\Entity\Project;
+use App\Repository\IssueFieldRepository;
+use App\Repository\IssueFieldValueRepository;
 use App\Repository\IssueRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -119,5 +122,20 @@ class MainController extends AbstractController
             ]
         ]);
 
+    }
+
+    #[Route('/test', name: 'app_test')]
+    public function testroute(IssueFieldRepository $issueFieldRepository) {
+        $pr = new Project();
+        $pr->setId('10000');
+
+        $x = $issueFieldRepository->findBy(['project'=>[$pr,null]]);
+        dump($x);
+        return $this->render(
+            'base.html.twig',
+            [
+                'data'=>'OK',
+            ]
+        );
     }
 }

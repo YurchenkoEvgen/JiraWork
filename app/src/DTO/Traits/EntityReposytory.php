@@ -5,18 +5,15 @@ namespace App\DTO\Traits;
 trait EntityReposytory {
     public function merge($entity, bool $flush = false): void
     {
-        if ($this->find($entity->getId())){
-            $this->getEntityManager()->merge($entity);
-        } else {
-            $this->getEntityManager()->persist($entity);
-        }
+        $this->getEntityManager()->merge($entity);
 
         if ($flush) {
-            $this->getEntityManager()->flush();
+            $this->flush();
         }
     }
 
-    public function flush(){
+    public function flush():void
+    {
         $this->getEntityManager()->flush();
     }
 }

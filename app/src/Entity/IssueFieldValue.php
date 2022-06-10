@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\IssueFieldValueRepository;
+use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IssueFieldValueRepository::class)]
@@ -23,9 +24,6 @@ class IssueFieldValue
 
     #[ORM\Column(type: 'string', length: 50)]
     private string $datacolumn;
-
-    #[ORM\Column(type: 'boolean', nullable: false)]
-    private bool $isArray;
 
     #[ORM\Column(type: 'string', length: 2048, nullable: true)]
     private string $value_string;
@@ -74,6 +72,22 @@ class IssueFieldValue
     {
         $this->issueFiled = $issueFiled;
 
+        $associations = array(
+            'number' => 'float',
+            'user' => User::class,
+            'datetime' => 'datetime',
+            'any' => 'serialize',
+            'date' => 'date',
+            'json' => 'json',
+            'project' => Project::class,
+            'issue' => Issue::class
+        );
+
+        $this->setType(
+            (array_key_exists($this->issueFiled->getType(), $associations))?
+                $associations[$this->issueFiled->getType()]:
+                'string');
+
         return $this;
     }
 
@@ -85,6 +99,12 @@ class IssueFieldValue
     public function setType(string $type): self
     {
         $this->type = $type;
+
+        $association = array(
+            'float' => 'float',
+            User::class => 'user',
+            'datetime' => 'date'
+        );
 
         return $this;
     }

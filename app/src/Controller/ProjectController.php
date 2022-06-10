@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Form\ProjectType;
 use App\Repository\ProjectRepository;
+use Doctrine\ORM\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,24 +22,24 @@ class ProjectController extends AbstractController
         ]);
     }
 
-//    #[Route('/new', name: 'app_project_new', methods: ['GET', 'POST'])]
-//    public function new(Request $request, ProjectRepository $projectRepository): Response
-//    {
-//        $project = new Project();
-//        $form = $this->createForm(ProjectType::class, $project);
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $projectRepository->add($project, true);
-//
-//            return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
-//        }
-//
-//        return $this->renderForm('project/new.html.twig', [
-//            'project' => $project,
-//            'form' => $form,
-//        ]);
-//    }
+    #[Route('/new', name: 'app_project_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, ProjectRepository $projectRepository): Response
+    {
+        $project = new Project();
+        $form = $this->createForm(ProjectType::class, $project);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $projectRepository->add($project, true);
+
+            return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('project/new.html.twig', [
+            'project' => $project,
+            'form' => $form,
+        ]);
+    }
 
     #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
     public function show(Project $project): Response

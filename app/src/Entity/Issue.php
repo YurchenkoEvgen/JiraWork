@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\IssueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -111,6 +112,25 @@ class Issue
             $this->_key = $data['key'];
             $this->summary = $data['fields']['summary'];
             $this->project = new Project($data['fields']['project']);
+
+            foreach ($data['fields'] as $key=>$field) {
+                $issueFieldValue = new IssueFieldValue();
+                $issueField = new IssueField();
+                $issueField->setId($key);
+                $issueFieldValue
+                    ->setIssue($this)
+                    ->setIssueFiled($issueField)
+                    ->setValue(
+                        mb_substr(
+                            print_r($field,true),
+                            0,
+                            2048
+                        ),
+                        'string'
+                    )
+                    ->setIsArray(false);
+                $this->issueFieldValues->add($issueFieldValue);
+            }
         }
 
         return $this;

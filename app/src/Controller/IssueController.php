@@ -65,8 +65,7 @@ class IssueController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $edit = editIssue::getInterface(ConnectionInfo::getByRequest($request))->setIssue($issue);
             if ($edit->getData()) {
-                $issueRepository->add($issue,true);
-                return $this->redirectToRoute('app_issue_index', [], Response::HTTP_SEE_OTHER);
+                $issueRepository->add($issue, true);
             } else {
                 dump($edit);
             }

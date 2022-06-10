@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\DTO\Traits\EntityReposytory;
 use App\Entity\Issue;
+use App\Entity\IssueFieldValue;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -26,7 +27,6 @@ class IssueRepository extends ServiceEntityRepository
     public function add(Issue $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
-
         if ($flush) {
             $this->getEntityManager()->flush();
         }
@@ -41,15 +41,31 @@ class IssueRepository extends ServiceEntityRepository
         }
     }
 
-    public function merge(Issue $entity, bool $flush = false): void
+    public function merge(Issue $entity, bool $flush = false): Issue
     {
-
-        $this->getEntityManager()->merge($entity);
+        $managedEntity = $this->getEntityManager()->merge($entity);
+        $this->mergeFields(
+            $managedEntity,
+            $entity->getIssueFieldValues()->toArray()
+        );
 
         if ($flush) {
-            $this->getEntityManager()->flush();
+            $this->flush();
+        }
+
+        return $managedEntity;
+    }
+
+    private function mergeFields(Issue $managedEntity, array $newValuesCollection):void
+    {
+        $_em = $this->getEntityManager();
+        $fields = $managedEntity->getIssueFieldValues();
+        $fields->initialize();
+        foreach ($newValuesCollection as $item) {
+            $_em->merge($item);
         }
     }
+
 
 //    /**
 //     * @return Issue[] Returns an array of Issue objects

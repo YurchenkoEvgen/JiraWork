@@ -70,7 +70,7 @@ class IssueField
 
     public function getName(): ?string
     {
-        return $this->name;
+        return $this->name??'';
     }
 
     public function setName(string $name): self
@@ -146,8 +146,8 @@ class IssueField
                 $this->isArray = true;
                 $this->type =$data['schema']['items'];
             }
-        } elseif ($this->name == 'parent') {
-            $this->type = 'IssueField';
+        } elseif ($this->id == 'parent') {
+            $this->type = 'issue';
         } else {
             $this->type = '';
         }
@@ -201,6 +201,6 @@ class IssueField
 
     public function __toString(): string
     {
-        return $this->name;
+        return $this->getName();
     }
 }

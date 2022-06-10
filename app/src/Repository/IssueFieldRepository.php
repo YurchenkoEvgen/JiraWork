@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\DTO\Traits\EntityReposytory;
 use App\Entity\IssueField;
+use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -41,6 +42,10 @@ class IssueFieldRepository extends ServiceEntityRepository
         }
     }
 
+    public function getForProject(Project $project)
+    {
+        return $this->findBy(['project'=>[$project,null]]);
+    }
 //    /**
 //     * @return IssueField[] Returns an array of IssueField objects
 //     */
