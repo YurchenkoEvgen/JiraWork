@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\IssueFieldValueRepository;
-use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IssueFieldValueRepository::class)]
@@ -32,7 +31,7 @@ class IssueFieldValue
     private float $value_float;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $value_date;
+    private \DateTimeInterface $value_date;
 
     #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist', 'merge'])]
     #[ORM\JoinColumn(nullable: true)]
@@ -43,12 +42,20 @@ class IssueFieldValue
     private ?Issue $value_issue;
 
     #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist', 'merge'])]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(referencedColumnName: 'account_id', nullable: true)]
     private ?User $value_user;
+
+    private $type;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId():self
+    {
+        $this->id;
+        return $this;
     }
 
     public function getIssue(): ?Issue
@@ -72,27 +79,34 @@ class IssueFieldValue
     {
         $this->issueFiled = $issueFiled;
 
+        //SET TYPE
         $associations = array(
             'number' => 'float',
             'user' => User::class,
-            'datetime' => 'datetime',
+            'datetime' => \DateTimeImmutable::class,
             'any' => 'serialize',
             'date' => 'date',
             'json' => 'json',
             'project' => Project::class,
-            'issue' => Issue::class
+            'issue' => Issue::class,
+            'progress' => 'serialize'
+            ,
         );
 
         $this->setType(
             (array_key_exists($this->issueFiled->getType(), $associations))?
                 $associations[$this->issueFiled->getType()]:
                 'string');
+        $this->setIsArray($issueFiled->getIsArray());
 
         return $this;
     }
 
     public function getType(): ?string
     {
+        if (empty($this->type) && isset($this->issueFiled)) {
+            $this->setIssueFiled($this->issueFiled);
+        }
         return $this->type;
     }
 
@@ -100,10 +114,17 @@ class IssueFieldValue
     {
         $this->type = $type;
 
+        //SET COLUMN
         $association = array(
             'float' => 'float',
             User::class => 'user',
-            'datetime' => 'date'
+            \DateTimeImmutable::class => 'date',
+            Project::class => 'project',
+            Issue::class => 'issue'
+        );
+
+        $this->setDatacolumn(
+            (array_key_exists($type,$association))?$association[$type]:'string'
         );
 
         return $this;
@@ -114,9 +135,10 @@ class IssueFieldValue
         return $this->datacolumn;
     }
 
-    public function setDatacolumn(string $datacolumn): self
+    protected function setDatacolumn(string $datacolumn): self
     {
-        $this->datacolumn = $datacolumn;
+
+        $this->DataColumnIsValid($datacolumn);
 
         return $this;
     }
@@ -141,8 +163,12 @@ class IssueFieldValue
 
     public function getValue(?string $dataColumn = null):mixed
     {
-        if ($this->DataColumnIsValid($dataColumn)) {
-            return $this->{'value_'.$this->datacolumn};
+        if ($this->DataColumnIsValid($dataColumn) && isset($this->{'value_'.$this->datacolumn})) {
+            $data = $this->{'value_'.$this->datacolumn};
+            if ($this->getType() == 'serialize') {
+                $data = json_decode($data,false);
+            }
+            return $data;
         } else {
             return null;
         }
@@ -150,10 +176,37 @@ class IssueFieldValue
 
     public function setValue(mixed $value, ?string $dataColumn = null):self
     {
-        if ($this->DataColumnIsValid($dataColumn)) {
-            $this->{'value_'.$this->datacolumn} = $value;
+        if (isset($value) && $this->DataColumnIsValid($dataColumn)) {
+            if (is_object($value)?($this->getType() != $value::class):(gettype($value) != $this->getType())) {
+                switch ($this->getType()) {
+                    case 'float':
+                        $dbvalue = (float)$value;
+                        break;
+                    case \DateTimeImmutable::class:
+                        $dbvalue = new \DateTimeImmutable($value);
+                        break;
+                    case User::class:
+                        $dbvalue = new User($value);
+                        break;
+                    case Project::class:
+                        $dbvalue = new Project($value);
+                        break;
+                    case Issue::class:
+                        $dbvalue = new Issue();
+                        $dbvalue->setProject($this->getIssue()->getProject());
+                        $dbvalue->importFromJira($value);
+                        break;
+                    case 'serialize':
+                        $dbvalue = json_encode($value,JSON_UNESCAPED_UNICODE);
+                        break;
+                    default:
+                        $dbvalue = substr(print_r($value,true), 0, 2048);
+                }
+            } else {
+                $dbvalue = $value;
+            }
+            $this->{'value_' . $this->datacolumn} = $dbvalue;
         }
-
         return $this;
     }
 

@@ -9,13 +9,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+//    #[ORM\Id]
+//    #[ORM\GeneratedValue]
+//    #[ORM\Column(type: 'integer')]
+//    private $id;
 
-    #[ORM\Column(type: 'string', length: 128)]
+    #[ORM\Id]
+    #[ORM\Column(type: 'string', length: 50)]
     private $accountId;
+
+    #[ORM\Column(type: 'string', length: 250)]
+    #[Assert\Url]
+    private string $_self;
+
+    #[ORM\Column(type: 'string', length: 50)]
+    private string $accountType;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Assert\Email]
@@ -27,9 +35,22 @@ class User
     #[ORM\Column(type: 'boolean')]
     private $active;
 
-    public function getId(): ?int
+    public function __construct(array $data)
     {
-        return $this->id;
+        $keysAssociation = array(
+            'accountId'=>'accountId',
+            'self'=>'_self',
+            'accountType'=>'accountType',
+            'emailAddress'=>'emailAddress',
+            'displayName'=>'displayName',
+            'active'=>'active',
+        );
+
+        foreach ($keysAssociation as $key=>$property) {
+            if (array_key_exists($key, $data)) {
+                $this->{$property} = $data[$key];
+            }
+        }
     }
 
     public function getAccountId(): ?string
@@ -44,16 +65,26 @@ class User
         return $this;
     }
 
-    public function getName(): ?string
+    public function getSelf():string
     {
-        return $this->name;
+        return $this->_self;
     }
 
-    public function setName(?string $name): self
+    public function setSelf(string $uri):self
     {
-        $this->name = $name;
-
+        $this->_self = $uri;
         return $this;
+    }
+
+    public function setAccountType(string $accountType):self
+    {
+        $this->accountType = $accountType;
+        return $this;
+    }
+
+    public function getAccountType():string
+    {
+        return  $this->accountType;
     }
 
     public function getEmailAddress(): ?string

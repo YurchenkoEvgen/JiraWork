@@ -7,7 +7,6 @@ use App\DTO\Jira\Issue\searchIssue;
 use App\DTO\Jira\Project\searchProject;
 use App\Entity\Project;
 use App\Repository\IssueFieldRepository;
-use App\Repository\IssueFieldValueRepository;
 use App\Repository\IssueRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -100,7 +99,7 @@ class MainController extends AbstractController
                 $search->addFilter('project = '.$data['project']);
             }
             $issueRepository = new IssueRepository($managerRegistry);
-            $data = $search->getData();
+            $data = $search->setManagerRegistry($managerRegistry)->getData();
             foreach ($data as $issue) {
                 $issueRepository->merge($issue);
             }

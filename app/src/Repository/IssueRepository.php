@@ -56,13 +56,67 @@ class IssueRepository extends ServiceEntityRepository
         return $managedEntity;
     }
 
+    private function createTree($collection):array
+    {
+        $tree = [];
+        foreach ($collection as $value) {
+            if ($value->getIssueFiled()->getIsArray()) {
+                $tree[$value->getIssueFiled()->getKey()][] = $value;
+            } else {
+                $tree[$value->getIssueFiled()->getKey()] = $value;
+            }
+        }
+        return  $tree;
+    }
+    
+    private function compare($val1,$val2):bool
+    {
+        return gettype($val1) == gettype($val2) &&
+            ((is_object($val1) && method_exists($val1,'getId')) ?
+                $val1->getId() == $val2->getId() :
+                $val1 == $val2);
+    }
+
     private function mergeFields(Issue $managedEntity, array $newValuesCollection):void
     {
         $_em = $this->getEntityManager();
         $fields = $managedEntity->getIssueFieldValues();
         $fields->initialize();
-        foreach ($newValuesCollection as $item) {
-            $_em->merge($item);
+
+        $bdvalues = $this->createTree($fields);
+
+        foreach ($this->createTree($newValuesCollection) as $key=>$item) {
+            if (array_key_exists($key,$bdvalues)) {
+                $value = $bdvalues[$key];
+                if (is_array($item)) {
+                    $iteams = [];
+                    $values = [];
+                    foreach ($item as $i) {
+                        $iteams[] = $i->getValue();
+                    }
+                    foreach ($value as $i) {
+                        $values[] = $i->getValue();
+                    }
+                    foreach (array_diff($iteams,$values) as $key=>$i) {//find added element
+                        $_em->merge($item[$key]);
+                    }
+                    foreach (array_diff($values,$iteams) as $key=>$i) {//delete element
+                        $_em->remove($value[$key]);
+                    }
+                } else {
+                    if (!$this->compare($item->getValue(),$value->getValue())) {
+                        $_em->merge($value->setValue($item->getValue()));
+                    }
+                }
+            } else {//is new field
+                if (is_array($item)) {
+                    foreach ($item as $i) {
+                        $_em->merge($i);
+                    }
+                } else {
+                    $_em->merge($item);
+                }
+            }
         }
     }
 

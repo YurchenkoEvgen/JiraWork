@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\IssueFieldRepository;
 use App\Repository\IssueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
@@ -100,36 +101,53 @@ class Issue
         return $this->getSummary(). ' ('. $this->id.')';
     }
 
-    public function importFromJira(array $data):self
+    public function importFromJira(array $data, ?ManagerRegistry $managerRegistry=null):self
     {
         if (
             empty(array_diff_key(array_fill_keys(['id','self','key','fields'],null),$data)) &&
             is_array($data['fields']) &&
-            empty(array_diff_key(array_fill_keys(['summary','project'],null),$data['fields']))
+            array_key_exists('summary',$data['fields']) &&
+            (array_key_exists('project',$data['fields']) || isset($this->project))
         ) {
             $this->id = $data['id'];
             $this->_self = $data['self'];
             $this->_key = $data['key'];
             $this->summary = $data['fields']['summary'];
-            $this->project = new Project($data['fields']['project']);
+            if (array_key_exists('project',$data['fields'])) {
+                $this->project = new Project($data['fields']['project']);
+            }
 
-            foreach ($data['fields'] as $key=>$field) {
-                $issueFieldValue = new IssueFieldValue();
-                $issueField = new IssueField();
-                $issueField->setId($key);
-                $issueFieldValue
-                    ->setIssue($this)
-                    ->setIssueFiled($issueField)
-                    ->setValue(
-                        mb_substr(
-                            print_r($field,true),
-                            0,
-                            2048
-                        ),
-                        'string'
-                    )
-                    ->setIsArray(false);
-                $this->issueFieldValues->add($issueFieldValue);
+            if (isset($managerRegistry)) {
+                $IssueFieldsRepository = new IssueFieldRepository($managerRegistry);
+                $issueFields = [];
+                foreach ($IssueFieldsRepository->getForProject($this->project) as $value) {
+                    $issueFields[$value->getId()] = $value;
+                }
+                foreach ($data['fields'] as $key => $field) {
+                    if (array_key_exists($key, $issueFields)) {
+                        $issueField = $issueFields[$key];
+                    } else {
+                        $issueField = new IssueField();
+                        $issueField->setId($key);
+                    }
+
+                    if ($issueField->getIsArray()) {
+                        $array = $field ?? [null];
+                    } else {
+                        $array = array($field);
+                    }
+
+                    foreach ($array as $item) {
+                        $issueFieldValue = new IssueFieldValue();
+                        $issueFieldValue
+                            ->setIssue($this)
+                            ->setIssueFiled($issueField)
+                            ->setValue($item);
+                        $this->issueFieldValues->add($issueFieldValue);
+                    }
+
+
+                }
             }
         }
 
