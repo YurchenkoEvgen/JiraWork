@@ -1,0 +1,280 @@
+{
+  "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations,customfield_10010.requestTypePractice",
+  "id": "10002",
+  "self": "https://evgenijvy.atlassian.net/rest/api/2/issue/10002",
+  "key": "TEST-3",
+  "fields": {
+    "statuscategorychangedate": "2022-05-03T15:54:28.210+0300",
+    "issuetype": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/issuetype/10003",
+      "id": "10003",
+      "description": "Подзадача позволяет отслеживать небольшие части работы, которые входят в более крупные задания.",
+      "iconUrl": "https://evgenijvy.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10316?size=medium",
+      "name": "Подзадача",
+      "subtask": true,
+      "avatarId": 10316,
+      "entityId": "bbb60802-98b8-4af6-9403-f6f3b0f0dd45",
+      "hierarchyLevel": -1
+    },
+    "parent": {
+      "id": "10000",
+      "key": "TEST-1",
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/issue/10000",
+      "fields": {
+        "summary": "Task1 id3",
+        "status": {
+          "self": "https://evgenijvy.atlassian.net/rest/api/2/status/10000",
+          "description": "",
+          "iconUrl": "https://evgenijvy.atlassian.net/",
+          "name": "К выполнению",
+          "id": "10000",
+          "statusCategory": {
+            "self": "https://evgenijvy.atlassian.net/rest/api/2/statuscategory/2",
+            "id": 2,
+            "key": "new",
+            "colorName": "blue-gray",
+            "name": "К выполнению"
+          }
+        },
+        "priority": {
+          "self": "https://evgenijvy.atlassian.net/rest/api/2/priority/3",
+          "iconUrl": "https://evgenijvy.atlassian.net/images/icons/priorities/medium.svg",
+          "name": "Medium",
+          "id": "3"
+        },
+        "issuetype": {
+          "self": "https://evgenijvy.atlassian.net/rest/api/2/issuetype/10001",
+          "id": "10001",
+          "description": "Небольшая порция работы.",
+          "iconUrl": "https://evgenijvy.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10318?size=medium",
+          "name": "Задача",
+          "subtask": false,
+          "avatarId": 10318,
+          "entityId": "77db7e70-ba49-4541-8be9-fefd94449a1c",
+          "hierarchyLevel": 0
+        }
+      }
+    },
+    "timespent": null,
+    "project": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/project/10000",
+      "id": "10000",
+      "key": "TEST",
+      "name": "Test",
+      "projectTypeKey": "software",
+      "simplified": true,
+      "avatarUrls": {
+        "48x48": "https://evgenijvy.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10419",
+        "24x24": "https://evgenijvy.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10419?size=small",
+        "16x16": "https://evgenijvy.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10419?size=xsmall",
+        "32x32": "https://evgenijvy.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10419?size=medium"
+      }
+    },
+    "customfield_10031": null,
+    "customfield_10032": null,
+    "fixVersions": [],
+    "aggregatetimespent": null,
+    "resolution": null,
+    "resolutiondate": null,
+    "workratio": -1,
+    "lastViewed": "2022-06-15T14:07:17.938+0300",
+    "watches": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/issue/TEST-3/watchers",
+      "watchCount": 1,
+      "isWatching": true
+    },
+    "issuerestriction": {
+      "issuerestrictions": {},
+      "shouldDisplay": true
+    },
+    "created": "2022-05-03T15:54:27.657+0300",
+    "customfield_10020": null,
+    "customfield_10021": null,
+    "customfield_10022": null,
+    "customfield_10023": null,
+    "priority": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/priority/3",
+      "iconUrl": "https://evgenijvy.atlassian.net/images/icons/priorities/medium.svg",
+      "name": "Medium",
+      "id": "3"
+    },
+    "customfield_10024": null,
+    "customfield_10025": null,
+    "labels": [],
+    "customfield_10016": null,
+    "customfield_10017": null,
+    "customfield_10018": {
+      "hasEpicLinkFieldDependency": false,
+      "showField": false,
+      "nonEditableReason": {
+        "reason": "PLUGIN_LICENSE_ERROR",
+        "message": "Ссылка на родителя доступна только пользователям Jira Premium."
+      }
+    },
+    "customfield_10019": "0|i0000f:",
+    "timeestimate": null,
+    "aggregatetimeoriginalestimate": null,
+    "versions": [],
+    "issuelinks": [],
+    "assignee": null,
+    "updated": "2022-06-15T17:16:53.345+0300",
+    "status": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/status/10000",
+      "description": "",
+      "iconUrl": "https://evgenijvy.atlassian.net/",
+      "name": "К выполнению",
+      "id": "10000",
+      "statusCategory": {
+        "self": "https://evgenijvy.atlassian.net/rest/api/2/statuscategory/2",
+        "id": 2,
+        "key": "new",
+        "colorName": "blue-gray",
+        "name": "К выполнению"
+      }
+    },
+    "components": [],
+    "timeoriginalestimate": null,
+    "description": "1235888",
+    "customfield_10010": null,
+    "customfield_10014": null,
+    "timetracking": {},
+    "customfield_10015": null,
+    "customfield_10005": null,
+    "customfield_10006": null,
+    "customfield_10007": null,
+    "security": null,
+    "customfield_10008": null,
+    "attachment": [
+      {
+        "self": "https://evgenijvy.atlassian.net/rest/api/2/attachment/10001",
+        "id": "10001",
+        "filename": "readme.txt",
+        "author": {
+          "self": "https://evgenijvy.atlassian.net/rest/api/2/user?accountId=70121%3Abcc84914-da4f-4dba-8050-1c30399e73ec",
+          "accountId": "70121:bcc84914-da4f-4dba-8050-1c30399e73ec",
+          "emailAddress": "evgenijvy@gmail.com",
+          "avatarUrls": {
+            "48x48": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+            "24x24": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+            "16x16": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+            "32x32": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png"
+          },
+          "displayName": "Евгений Юрченко",
+          "active": true,
+          "timeZone": "Europe/Kiev",
+          "accountType": "atlassian"
+        },
+        "created": "2022-06-15T14:07:10.920+0300",
+        "size": 237,
+        "mimeType": "text/plain",
+        "content": "https://evgenijvy.atlassian.net/rest/api/2/attachment/content/10001"
+      }
+    ],
+    "aggregatetimeestimate": null,
+    "customfield_10009": null,
+    "summary": "SubTask2",
+    "creator": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/user?accountId=70121%3Abcc84914-da4f-4dba-8050-1c30399e73ec",
+      "accountId": "70121:bcc84914-da4f-4dba-8050-1c30399e73ec",
+      "emailAddress": "evgenijvy@gmail.com",
+      "avatarUrls": {
+        "48x48": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+        "16x16": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png"
+      },
+      "displayName": "Евгений Юрченко",
+      "active": true,
+      "timeZone": "Europe/Kiev",
+      "accountType": "atlassian"
+    },
+    "subtasks": [],
+    "reporter": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/user?accountId=70121%3Abcc84914-da4f-4dba-8050-1c30399e73ec",
+      "accountId": "70121:bcc84914-da4f-4dba-8050-1c30399e73ec",
+      "emailAddress": "evgenijvy@gmail.com",
+      "avatarUrls": {
+        "48x48": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+        "16x16": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png"
+      },
+      "displayName": "Евгений Юрченко",
+      "active": true,
+      "timeZone": "Europe/Kiev",
+      "accountType": "atlassian"
+    },
+    "customfield_10000": "{}",
+    "aggregateprogress": {
+      "progress": 0,
+      "total": 0
+    },
+    "customfield_10001": null,
+    "customfield_10002": null,
+    "customfield_10003": null,
+    "customfield_10004": null,
+    "environment": null,
+    "duedate": null,
+    "progress": {
+      "progress": 0,
+      "total": 0
+    },
+    "votes": {
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/issue/TEST-3/votes",
+      "votes": 0,
+      "hasVoted": false
+    },
+    "comment": {
+      "comments": [
+        {
+          "self": "https://evgenijvy.atlassian.net/rest/api/2/issue/10002/comment/10001",
+          "id": "10001",
+          "author": {
+            "self": "https://evgenijvy.atlassian.net/rest/api/2/user?accountId=70121%3Abcc84914-da4f-4dba-8050-1c30399e73ec",
+            "accountId": "70121:bcc84914-da4f-4dba-8050-1c30399e73ec",
+            "emailAddress": "evgenijvy@gmail.com",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+              "24x24": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+              "16x16": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+              "32x32": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png"
+            },
+            "displayName": "Евгений Юрченко",
+            "active": true,
+            "timeZone": "Europe/Kiev",
+            "accountType": "atlassian"
+          },
+          "body": "тест комментарий",
+          "updateAuthor": {
+            "self": "https://evgenijvy.atlassian.net/rest/api/2/user?accountId=70121%3Abcc84914-da4f-4dba-8050-1c30399e73ec",
+            "accountId": "70121:bcc84914-da4f-4dba-8050-1c30399e73ec",
+            "emailAddress": "evgenijvy@gmail.com",
+            "avatarUrls": {
+              "48x48": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+              "24x24": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+              "16x16": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png",
+              "32x32": "https://secure.gravatar.com/avatar/320875e667744fd678035cb4727153d0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Fdefault-avatar-3.png"
+            },
+            "displayName": "Евгений Юрченко",
+            "active": true,
+            "timeZone": "Europe/Kiev",
+            "accountType": "atlassian"
+          },
+          "created": "2022-06-15T17:16:53.345+0300",
+          "updated": "2022-06-15T17:16:53.345+0300",
+          "jsdPublic": true
+        }
+      ],
+      "self": "https://evgenijvy.atlassian.net/rest/api/2/issue/10002/comment",
+      "maxResults": 1,
+      "total": 1,
+      "startAt": 0
+    },
+    "worklog": {
+      "startAt": 0,
+      "maxResults": 20,
+      "total": 0,
+      "worklogs": []
+    }
+  }
+}

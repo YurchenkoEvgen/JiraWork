@@ -71,10 +71,23 @@ class IssueRepository extends ServiceEntityRepository
     
     private function compare($val1,$val2):bool
     {
-        return gettype($val1) == gettype($val2) &&
-            ((is_object($val1) && method_exists($val1,'getId')) ?
-                $val1->getId() == $val2->getId() :
-                $val1 == $val2);
+        $returned = gettype($val1) == gettype($val2);
+        if ($returned) {
+            if (is_object($val1)) {
+                if ($val1 instanceof \DateTimeInterface && $val2 instanceof \DateTimeInterface) { //date check
+                    $returned = $val1->diff($val2,true)->s == 0;
+                } else { //other object
+                    $nameClass1 = ($val1 instanceof \Doctrine\ORM\Proxy\Proxy) ? get_parent_class($val1) : get_class($val1);
+                    $nameClass2 = ($val2 instanceof \Doctrine\ORM\Proxy\Proxy) ? get_parent_class($val2) : get_class($val2);
+                    $returned = $nameClass1 == $nameClass2 &&
+                        (method_exists($val1, 'gatId')) ? $val1->gatId() == $val2->getId() : $val1 == $val2;
+                }
+            } else {
+                $returned = $val1 == $val2;
+            }
+        }
+
+        return $returned;
     }
 
     private function mergeFields(Issue $managedEntity, array $newValuesCollection):void

@@ -39,6 +39,7 @@ class JiraApiCore
             $this->errors = [];
             $this->responseCode = 0;
             $this->responseBody = '';
+            $this->responseBodyInArray = [];
         } else {
             $this->addError('Wrong connection setting');
         }
@@ -87,6 +88,7 @@ class JiraApiCore
     }
 
     protected function setUri(string $uri):self {
+        $uri = str_replace($this->basicUri,'',$uri);
         $this->uri = $this->basicUri.$uri;
         return $this;
     }
@@ -145,7 +147,8 @@ class JiraApiCore
         return $this->isValid();
     }
 
-    public function addOption(string $name, mixed $value,string $preefix = ''):self {
+    public function addOption(string $name, mixed $value,string $preefix = ''):self
+    {
         $options = (array_key_exists('json',$this->arg)?$this->arg['json']:[]);
 
         if (array_key_exists($name,$options)) {
@@ -157,6 +160,14 @@ class JiraApiCore
         } else {
             $options[$name] = $value;
         }
+        $this->arg['json'] = $options;
+        return $this;
+    }
+
+    public function updOption(string $name, mixed $value):self
+    {
+        $options = (array_key_exists('json',$this->arg)?$this->arg['json']:[]);
+        $options[$name] = $value;
         $this->arg['json'] = $options;
         return $this;
     }

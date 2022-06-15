@@ -3,12 +3,14 @@
 namespace App\DTO\Jira\Issue;
 
 use App\DTO\Jira\JiraApiCore;
+use App\DTO\Jira\ObjectPagination;
 use App\Entity\Issue;
 use App\DTO\Jira\JiraAPIInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 class searchIssue extends JiraApiCore implements JiraAPIInterface
 {
+    use ObjectPagination;
     private ManagerRegistry $_em;
 
     public function getData():array
@@ -17,22 +19,33 @@ class searchIssue extends JiraApiCore implements JiraAPIInterface
 
         $this
             ->setUri('search')
-            ->setMethod('POST');
-        if ($this->sendRequest()) {
-            foreach ($this->getArray()['issues'] as $value) {
-                $issue = new Issue();
-                $issue->importFromJira($value, $this->_em);
-                $returned[] = $issue;
+            ->setMethod('POST')
+            ->addOption('maxResults',10)
+        ;
+        do {
+            if ($this->sendRequest()) {
+                foreach ($this->getArray()['issues'] as $value) {
+                    $issue = new Issue();
+                    $issue->importFromJira($value, $this->_em);
+                    $returned[] = $issue;
+                }
+            } else {
+                switch ($this->getResponseCode()) {
+                    case 400:
+                        $this->addError('JQL query is invalid');
+                        break;
+                    default:
+                        $this->defaultError();
+                }
             }
-        } else {
-            switch ($this->getResponseCode()) {
-                case 400:
-                    $this->addError('JQL query is invalid');
-                    break;
-                default:
-                    $this->defaultError();
+            dump($this);
+            if($this->haveNext()) {
+                $options = $this->getPaginationParams();
+                foreach ($options as $key=>$opt) {
+                    $this->updOption($key,$opt);
+                }
             }
-        }
+        } while (!$this->hasErrors() && $this->haveNext());
 
         return $returned;
     }

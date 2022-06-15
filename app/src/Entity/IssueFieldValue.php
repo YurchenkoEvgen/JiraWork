@@ -52,9 +52,9 @@ class IssueFieldValue
         return $this->id;
     }
 
-    public function setId():self
+    public function setId($id):self
     {
-        $this->id;
+        $this->id = $id;
         return $this;
     }
 
@@ -83,7 +83,7 @@ class IssueFieldValue
         $associations = array(
             'number' => 'float',
             'user' => User::class,
-            'datetime' => \DateTimeImmutable::class,
+            'datetime' => \DateTime::class,
             'any' => 'serialize',
             'date' => 'date',
             'json' => 'json',
@@ -118,7 +118,7 @@ class IssueFieldValue
         $association = array(
             'float' => 'float',
             User::class => 'user',
-            \DateTimeImmutable::class => 'date',
+            \DateTime::class => 'date',
             Project::class => 'project',
             Issue::class => 'issue'
         );
@@ -182,8 +182,9 @@ class IssueFieldValue
                     case 'float':
                         $dbvalue = (float)$value;
                         break;
-                    case \DateTimeImmutable::class:
-                        $dbvalue = new \DateTimeImmutable($value);
+                    case \DateTime::class:
+                        $dbvalue = new \DateTime($value);
+                        $dbvalue->setTimezone(new \DateTimeZone('UTC'));
                         break;
                     case User::class:
                         $dbvalue = new User($value);
