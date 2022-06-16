@@ -126,9 +126,9 @@ class MainController extends AbstractController
     #[Route('/test', name: 'app_test')]
     public function testroute(IssueFieldRepository $issueFieldRepository) {
         $pr = new Project();
-        $pr->setId('10000');
+        $pr->setId('10001');
 
-        $x = $issueFieldRepository->findBy(['project'=>[$pr,null]]);
+        $x = $issueFieldRepository->getForProject($pr);
         dump($x);
         return $this->render(
             'base.html.twig',

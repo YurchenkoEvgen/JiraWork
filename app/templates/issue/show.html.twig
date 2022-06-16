@@ -12,9 +12,21 @@
                 <td>{{ issue.id }}</td>
             </tr>
             <tr>
-                <th>Summary</th>
-                <td>{{ issue.summary }}</td>
+                <th>FIELDS:</th>
             </tr>
+            {% for field in issue.issueFieldValues %}
+                {% dump(field) %}
+                <tr>
+                    <th>{{ field.issueFiled }}</th>
+                    <td>
+{#                        {% if field.getRouteValue %}#}
+{#                            <a href="{{ path(field.getRouteValue,field.getValue) }}">{{ field.getValueForTemplate }}</a>#}
+{#                        {% else %}#}
+                            {{ field.getValueForTemplate }}
+{#                        {% endif %}#}
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 

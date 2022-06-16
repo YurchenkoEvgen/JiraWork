@@ -25,13 +25,13 @@ class IssueFieldValue
     private string $datacolumn;
 
     #[ORM\Column(type: 'string', length: 2048, nullable: true)]
-    private string $value_string;
+    private ?string $value_string;
 
     #[ORM\Column(type: 'float', nullable: true)]
-    private float $value_float;
+    private ?float $value_float;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private \DateTimeInterface $value_date;
+    private ?\DateTimeInterface $value_date;
 
     #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist', 'merge'])]
     #[ORM\JoinColumn(nullable: true)]
@@ -172,6 +172,25 @@ class IssueFieldValue
         } else {
             return null;
         }
+    }
+
+    public function getValueForTemplate():mixed
+    {
+        $data = $this->{'value_'.$this->datacolumn};
+        return ($this->datacolumn == 'date' && $data instanceof \DateTimeInterface)?
+            $data->format(\DateTime::ATOM):$data;
+    }
+
+    public function getRouteValue():string
+    {
+        switch ($this->datacolumn) {
+            case 'issue':
+                return 'app_issue_show';
+            case 'project':
+                return 'app_project_show';
+        }
+
+        return '';
     }
 
     public function setValue(mixed $value, ?string $dataColumn = null):self

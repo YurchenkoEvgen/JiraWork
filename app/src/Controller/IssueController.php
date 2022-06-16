@@ -8,6 +8,7 @@ use App\DTO\Jira\Issue\deleteIssue;
 use App\DTO\Jira\Issue\editIssue;
 use App\Entity\Issue;
 use App\Form\IssueType;
+use App\Repository\IssueFieldRepository;
 use App\Repository\IssueRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,8 +51,9 @@ class IssueController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_issue_show', methods: ['GET'])]
-    public function show(Issue $issue): Response
+    public function show(Issue $issue, IssueFieldRepository $issueFieldRepository): Response
     {
+        $issueFieldRepository->getForProject($issue->getProject());
         return $this->render('issue/show.html.twig', [
             'issue' => $issue,
         ]);

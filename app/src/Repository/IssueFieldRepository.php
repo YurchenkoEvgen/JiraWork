@@ -44,7 +44,12 @@ class IssueFieldRepository extends ServiceEntityRepository
 
     public function getForProject(Project $project)
     {
-        return $this->findBy(['project'=>[$project,null]]);
+        return $this->createQueryBuilder('p')
+            ->where('p.project = :val')
+            ->setParameter('val',$project)
+            ->orWhere('p.project IS Null')
+            ->getQuery()
+            ->getResult();
     }
 //    /**
 //     * @return IssueField[] Returns an array of IssueField objects
