@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User{% endblock %}
+
+{% block body %}
+    <h1>User</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>AccountId</th>
+                <td>{{ user.accountId }}</td>
+            </tr>
+            <tr>
+                <th>_self</th>
+                <td>{{ user.self }}</td>
+            </tr>
+            <tr>
+                <th>AccountType</th>
+                <td>{{ user.accountType }}</td>
+            </tr>
+            <tr>
+                <th>EmailAddress</th>
+                <td>{{ user.emailAddress }}</td>
+            </tr>
+            <tr>
+                <th>DisplayName</th>
+                <td>{{ user.displayName }}</td>
+            </tr>
+            <tr>
+                <th>Active</th>
+                <td>{{ user.active ? 'Yes' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_user_index') }}">back to list</a>
+
+    <a href="{{ path('app_user_edit', {'accountId': user.accountId}) }}">edit</a>
+
+    {{ include('user/_delete_form.html.twig') }}
+{% endblock %}

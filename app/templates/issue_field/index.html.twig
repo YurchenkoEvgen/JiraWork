@@ -16,9 +16,8 @@
                 <th>clauseNames</th>
                 <th>Type</th>
                 <th>isArray</th>
+                <th>Searchable</th>
                 <th>actions</th>
-
-
             </tr>
         </thead>
         <tbody>
@@ -32,6 +31,7 @@
                 <td>{{ issue_field.clauseNames}}</td>
                 <td>{{ issue_field.type}}</td>
                 <td>{{ issue_field.isArray?'Yes':'No'}}</td>
+                <td>{{ issue_field.searchable?'Yes':'No'}}</td>
                 <td>
                     <a href="{{ path('app_issue_field_show', {'id': issue_field.id}) }}">show</a>
                     <a href="{{ path('app_issue_field_edit', {'id': issue_field.id}) }}">edit</a>

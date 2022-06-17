@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DTO\Project;
+namespace App\DTO\Jira\Project;
 
 use App\DTO\Jira\JiraApiCore;
 use App\DTO\Jira\JiraAPIInterface;

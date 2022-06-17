@@ -2,10 +2,12 @@
 
 namespace App\DTO\Jira\IssueField;
 
+use App\DTO\Jira\JiraApiCore;
+use App\DTO\Jira\JiraAPIInterface;
 use App\Entity\IssueField;
 use App\Repository\ProjectRepository;
 
-class getIssueFields extends \App\DTO\Jira\JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
+class getIssueFields extends JiraApiCore implements JiraAPIInterface
 {
     protected ?ProjectRepository $projectRepository;
 

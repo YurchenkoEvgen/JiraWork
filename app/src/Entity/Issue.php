@@ -169,6 +169,16 @@ class Issue
         return $this->issueFieldValues;
     }
 
+    public function getIssueFieldsValuesArray():array
+    {
+        $values = [];
+        foreach ($this->getIssueFieldValues() as $field)
+        {
+            $values[$field->getIssueFiled()->getKey()][] = $field;
+        }
+        return $values;
+    }
+
     public function addIssueFieldValue(IssueFieldValue $issueFieldValue): self
     {
         if (!$this->issueFieldValues->contains($issueFieldValue)) {

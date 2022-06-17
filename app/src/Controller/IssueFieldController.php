@@ -8,6 +8,7 @@ use App\Entity\IssueField;
 use App\Form\IssueFieldType;
 use App\Repository\IssueFieldRepository;
 use App\Repository\ProjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,13 +19,16 @@ use Symfony\Component\Routing\Annotation\Route;
 class IssueFieldController extends AbstractController
 {
     #[Route('/', name: 'app_issue_field_index', methods: ['GET', 'POST'])]
-    public function index(IssueFieldRepository $issueFieldRepository, Request $request, ProjectRepository $projectRepository): Response
+    public function index(IssueFieldRepository $issueFieldRepository, Request $request, ManagerRegistry $managerRegistry): Response
     {
         $form = $this->createFormBuilder()
             ->add('Sync', SubmitType::class,['label'=>'Sync Fields'])->getForm();
 
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
+            $projectRepository = new ProjectRepository($managerRegistry);
+            $issueFieldRepository = new IssueFieldRepository($managerRegistry);
+            $issueFieldRepository->findAll();
             $fields = getIssueFields::getInterface(ConnectionInfo::getByRequest($request))
                 ->setRepository($projectRepository)
                 ->getData();

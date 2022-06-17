@@ -9,11 +9,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
 {
-//    #[ORM\Id]
-//    #[ORM\GeneratedValue]
-//    #[ORM\Column(type: 'integer')]
-//    private $id;
-
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 50)]
     private $accountId;
@@ -51,6 +46,11 @@ class User
                 $this->{$property} = $data[$key];
             }
         }
+    }
+
+    public function getId():?string
+    {
+        return $this->getAccountId();
     }
 
     public function getAccountId(): ?string

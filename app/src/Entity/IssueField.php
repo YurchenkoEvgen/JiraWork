@@ -40,6 +40,9 @@ class IssueField
     #[ORM\Column(type: 'boolean', nullable: false)]
     private bool $isArray = false;
 
+    #[ORM\Column(type: 'boolean', nullable: false)]
+    private bool $searchable = false;
+
     public function __construct()
     {
         $this->issueFieldValues = new ArrayCollection();
@@ -133,8 +136,21 @@ class IssueField
         return $this;
     }
 
+    public function getSearchable():bool
+    {
+        return $this->searchable;
+    }
+
+    public function setSearchable(bool $searchable):self
+    {
+        $this->searchable = $searchable;
+        return $this;
+    }
+
     public function fillFromJira(array $data, ProjectRepository $projectRepository):self
     {
+        $this->type = 'string';
+
         $this->id = $data['id'];
         $this->_key = $data['key'];
         $this->name = $data['name'];
@@ -146,15 +162,18 @@ class IssueField
                 $this->isArray = true;
                 $this->type =$data['schema']['items'];
             }
-        } elseif ($this->id == 'parent') {
+        }
+        $this->searchable = $data['searchable'];
+
+        //No declared and fix
+        if (in_array($this->id,['subtasks','parent']) ) {
             $this->type = 'issue';
-        } else {
-            $this->type = '';
         }
 
         if (key_exists('scope',$data) && $data['scope']['type'] == 'PROJECT') {
             $this->project = $projectRepository->find($data['scope']['project']['id']);
         }
+
         return $this;
     }
 

@@ -14,16 +14,18 @@
             <tr>
                 <th>FIELDS:</th>
             </tr>
-            {% for field in issue.issueFieldValues %}
-                {% dump(field) %}
+            {% for name,fieldValues in issue.getIssueFieldsValuesArray %}
                 <tr>
-                    <th>{{ field.issueFiled }}</th>
+                    <th>{{name }}</th>
                     <td>
-{#                        {% if field.getRouteValue %}#}
-{#                            <a href="{{ path(field.getRouteValue,field.getValue) }}">{{ field.getValueForTemplate }}</a>#}
-{#                        {% else %}#}
-                            {{ field.getValueForTemplate }}
-{#                        {% endif %}#}
+                        {% for value in fieldValues %}
+                            {% if value.getRouteValue %}
+                                <a href="{{ path(value.getRouteValue,{'id':value.getValue.getId}) }}">{{ value.getValueForTemplate }}</a>
+                            {% else %}
+                                {{ value.getValueForTemplate }}
+                            {% endif %}
+                            <br>
+                        {% endfor %}
                     </td>
                 </tr>
             {% endfor %}

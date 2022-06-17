@@ -38,7 +38,6 @@ class searchIssue extends JiraApiCore implements JiraAPIInterface
                         $this->defaultError();
                 }
             }
-            dump($this);
             if($this->haveNext()) {
                 $options = $this->getPaginationParams();
                 foreach ($options as $key=>$opt) {

@@ -22,24 +22,26 @@ use Symfony\Component\Routing\Annotation\Route;
 class MainController extends AbstractController
 {
     #[Route('/', name: 'main')]
-    public function getmain(): Response {
+    public function getmain(): Response
+    {
 
         $form = $this->createFormBuilder()->getForm();
-        return $this->render('base.html.twig',[
+        return $this->render('base.html.twig', [
             'forms' => array($form->createView()),
             'data' => 'OK'
         ]);
     }
 
     #[Route('/auth', name: 'authform')]
-    public function gettestform(Request $request): Response {
+    public function gettestform(Request $request): Response
+    {
         $form = $this->createFormBuilder()
-            ->add('email', EmailType::class, ['data'=>$request->getSession()->get('auth_email')])
+            ->add('email', EmailType::class, ['data' => $request->getSession()->get('auth_email')])
             ->add('token', TextType::class, [
-                'data'=>$request->getSession()->get('auth_token'),
-                'attr'=>['maxlength'=>24, 'minlength'=>24]
+                'data' => $request->getSession()->get('auth_token'),
+                'attr' => ['maxlength' => 24, 'minlength' => 24]
             ])
-            ->add('url', UrlType::class, ['data'=>$request->getSession()->get('auth_url')])
+            ->add('url', UrlType::class, ['data' => $request->getSession()->get('auth_url')])
             ->add('submit', SubmitType::class)
             ->getForm();
 
@@ -49,6 +51,8 @@ class MainController extends AbstractController
             $request->getSession()->set('auth_email', $data['email']);
             $request->getSession()->set('auth_token', $data['token']);
             $request->getSession()->set('auth_url', $data['url']);
+
+
         }
 
         $con = ConnectionInfo::getByRequest($request);
@@ -57,20 +61,21 @@ class MainController extends AbstractController
             $request->getSession()->remove('authredirecturi');
             return $this->redirect($authredirecturi);
         }
-        return $this->render('base.html.twig',[
+        return $this->render('base.html.twig', [
             'forms' => array(
                 $form->createView()
             ),
-            'data' => print_r($request->getContent(),true)
+            'data' => print_r($request->getContent(), true)
         ]);
     }
 
     #[Route('/filter', name: 'search_issue')]
-    public function search_issue_new(Request $request, ManagerRegistry $managerRegistry): Response {
+    public function search_issue_new(Request $request, ManagerRegistry $managerRegistry): Response
+    {
         $connection = ConnectionInfo::getByRequest($request);
         $search = searchProject::getInterface($connection);
         $data = $search->getData();
-        $projects = ['Choice'=>null];
+        $projects = ['Choice' => null];
         foreach ($data as $value) {
             $projects[$value->getName()] = $value->getId();
         }
@@ -90,13 +95,13 @@ class MainController extends AbstractController
 
             $search = searchIssue::getInterface($connection);
             if (isset($data['label'])) {
-                $search->addFilter("labels = '".$data['label']."'");
+                $search->addFilter("labels = '" . $data['label'] . "'");
             }
-            if (isset($data['customlabel'])){
-                $search->addFilter('cf[10032] = '."'".$data['customlabel']."'");
+            if (isset($data['customlabel'])) {
+                $search->addFilter('cf[10032] = ' . "'" . $data['customlabel'] . "'");
             }
             if (isset($data['project'])) {
-                $search->addFilter('project = '.$data['project']);
+                $search->addFilter('project = ' . $data['project']);
             }
             $issueRepository = new IssueRepository($managerRegistry);
             $data = $search->setManagerRegistry($managerRegistry)->getData();
@@ -114,9 +119,9 @@ class MainController extends AbstractController
             ]);
         }
 
-        return $this->render('base.html.twig',[
-            'data'=>print_r($data, true),
-            'forms'=>[
+        return $this->render('base.html.twig', [
+            'data' => print_r($data, true),
+            'forms' => [
                 $form->createView()
             ]
         ]);
@@ -124,7 +129,8 @@ class MainController extends AbstractController
     }
 
     #[Route('/test', name: 'app_test')]
-    public function testroute(IssueFieldRepository $issueFieldRepository) {
+    public function testroute(IssueFieldRepository $issueFieldRepository)
+    {
         $pr = new Project();
         $pr->setId('10001');
 
@@ -133,8 +139,15 @@ class MainController extends AbstractController
         return $this->render(
             'base.html.twig',
             [
-                'data'=>'OK',
+                'data' => 'OK',
             ]
         );
     }
+
+//    #[Route('/new_filter', name: 'new_filter')]
+//    public function new_filter(ManagerRegistry $managerRegistry)
+//    {
+//        $IssueFieldRepository = new IssueFieldRepository($managerRegistry);
+//        $IssueFields = $IssueFieldRepository->findAll();
+//    }
 }

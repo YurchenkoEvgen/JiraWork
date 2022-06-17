@@ -62,6 +62,7 @@ class IssueController extends AbstractController
     #[Route('/{id}/edit', name: 'app_issue_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Issue $issue, IssueRepository $issueRepository): Response
     {
+        dump($request);
         $form = $this->createForm(IssueType::class, $issue);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\IssueFieldValueRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Routing\Route;
 
 #[ORM\Entity(repositoryClass: IssueFieldValueRepository::class)]
 class IssueFieldValue
@@ -90,7 +91,6 @@ class IssueFieldValue
             'project' => Project::class,
             'issue' => Issue::class,
             'progress' => 'serialize'
-            ,
         );
 
         $this->setType(
@@ -120,7 +120,7 @@ class IssueFieldValue
             User::class => 'user',
             \DateTime::class => 'date',
             Project::class => 'project',
-            Issue::class => 'issue'
+            Issue::class => 'issue',
         );
 
         $this->setDatacolumn(
@@ -183,19 +183,23 @@ class IssueFieldValue
 
     public function getRouteValue():string
     {
-        switch ($this->datacolumn) {
-            case 'issue':
-                return 'app_issue_show';
-            case 'project':
-                return 'app_project_show';
+        if (!empty($this->getValue()) ) {
+            switch ($this->datacolumn) {
+                case 'issue':
+                    return 'app_issue_show';
+                case 'project':
+                    return 'app_project_show';
+                case 'user':
+                    return 'app_user_show';
+            }
         }
 
         return '';
     }
 
-    public function setValue(mixed $value, ?string $dataColumn = null):self
+    public function setValue(mixed $value):self
     {
-        if (isset($value) && $this->DataColumnIsValid($dataColumn)) {
+        if (isset($value) && $this->DataColumnIsValid()) {
             if (is_object($value)?($this->getType() != $value::class):(gettype($value) != $this->getType())) {
                 switch ($this->getType()) {
                     case 'float':
