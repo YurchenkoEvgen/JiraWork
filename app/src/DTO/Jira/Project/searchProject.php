@@ -15,9 +15,7 @@ class searchProject extends JiraApiCore implements JiraAPIInterface
 
         $this->setUri('project/search');
         if ($this->sendRequest()) {
-            foreach ($this->getArray()['values'] as $value) {
-                $return[] = new Project($value);
-            }
+            $return = $this->extractData();
         } else {
             switch ($this->getResponseCode()) {
                 case 400:
@@ -31,5 +29,17 @@ class searchProject extends JiraApiCore implements JiraAPIInterface
             }
         }
         return $return;
+    }
+
+    public function extractData():array
+    {
+        $result = [];
+        if ($this->hasData()) {
+            foreach ($this->getArray()['values'] as $value) {
+                $result[] = new Project($value);
+            }
+        }
+
+        return $result;
     }
 }

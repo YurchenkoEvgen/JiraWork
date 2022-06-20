@@ -18,7 +18,7 @@ class createIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
                 ->setValidcodes('201')
                 ->addOption('fields',$this->issue->getJiraArray());
             if ($this->sendRequest()) {
-                $this->issue->setId($this->getArray()['id']);
+                $this->extractData();
             } else {
                 switch ($this->getResponseCode()) {
                     case 400:
@@ -39,6 +39,15 @@ is invalid for any other reason.');
             }
         } else {
             $this->addError('Not Issue set');
+        }
+
+        return $this->issue;
+    }
+
+    public function extractData():?Issue
+    {
+        if ($this->hasData()){
+            $this->issue->setId($this->getArray()['id']);
         }
 
         return $this->issue;

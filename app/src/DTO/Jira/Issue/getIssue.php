@@ -18,7 +18,7 @@ class getIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
         } else {
             $this->setUri('issue/'.$this->id);
             if ($this->sendRequest()) {
-                $returned = new Issue($this->getArray());
+                $returned = $this->extractData();
             } else {
                 switch ($this->getResponseCode()) {
                     case 404:
@@ -31,6 +31,15 @@ class getIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
         }
 
         return $returned;
+    }
+
+    public function extractData():Issue
+    {
+        $issue = new Issue();
+        if ($this->hasData()) {
+            $issue->importFromJira($this->getArray());
+        }
+        return $issue;
     }
 
     public function setID(string $ID){

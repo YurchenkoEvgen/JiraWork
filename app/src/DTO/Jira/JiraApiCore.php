@@ -19,6 +19,7 @@ class JiraApiCore
     protected bool $isValid;
     protected string $responseBody;
     protected array $responseBodyInArray;
+    protected bool $hasData;
 
     protected array $errors;
 
@@ -28,7 +29,7 @@ class JiraApiCore
         $this->isValid = $connectionInfo->isValid();
         if ($this->isValid) {
             $this->arg = [
-                'auth_basic'=>[
+                'auth_basic' => [
                     $connectionInfo->getEmail(),
                     $connectionInfo->getToken()
                 ]
@@ -40,6 +41,7 @@ class JiraApiCore
             $this->responseCode = 0;
             $this->responseBody = '';
             $this->responseBodyInArray = [];
+            $this->hasData = false;
         } else {
             $this->addError('Wrong connection setting');
         }
@@ -51,34 +53,45 @@ class JiraApiCore
     }
 
     //GETTERS
-    public function getError():array {
+    public function getError(): array
+    {
         return $this->errors;
     }
 
-    public function getContent():string {
+    public function getContent():string
+    {
         return $this->responseBody;
     }
 
-    public function getArray():array {
+    public function getArray():array
+    {
         return $this->responseBodyInArray;
     }
 
-    public function getResponseCode():int {
+    public function getResponseCode():int
+    {
         return $this->responseCode;
     }
 
+    public function hasData():bool
+    {
+        return $this->hasData;
+    }
+
     //STATE
-    public function isValid():bool {
+    public function isValid():bool
+    {
         return $this->isValid;
     }
 
-    public function hasErrors():bool {
-        return count($this->getError());
+    public function hasErrors(?int$code = null):bool
+    {
+        return (isset($code))?array_key_exists($code,$this->getError()):count($this->getError())>0;
     }
 
     //SETTERS
-    protected function addError($content):self {
-        $this->errors[] = $content;
+    protected function addError($content, $code = 0):self {
+        $this->errors[$code] = new \Error($content,$code);
         return $this;
     }
 
@@ -109,13 +122,13 @@ class JiraApiCore
     protected function defaultError() {
         switch ($this->responseCode) {
             case 401:
-                $this->addError('Authentication credentials are incorrect or missing.');
+                $this->addError('Authentication credentials are incorrect or missing.', 401);
                 break;
             case 405:
-                $this->addError('Method not Allowed');
+                $this->addError('Method not Allowed', 405);
                 break;
             default:
-                $this->addError('Something wrong. Unclassified error. HTTP code '.$this->getResponseCode());
+                $this->addError('Something wrong. Unclassified error. HTTP code '.$this->getResponseCode(), $this->getResponseCode());
         }
     }
 
@@ -143,8 +156,8 @@ class JiraApiCore
                 }
             }
         }
-
-        return $this->isValid();
+        $this->hasData = $this->isValid();
+        return $this->hasData;
     }
 
     public function addOption(string $name, mixed $value,string $preefix = ''):self

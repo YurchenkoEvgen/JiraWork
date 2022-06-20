@@ -24,15 +24,11 @@ class searchIssue extends JiraApiCore implements JiraAPIInterface
         ;
         do {
             if ($this->sendRequest()) {
-                foreach ($this->getArray()['issues'] as $value) {
-                    $issue = new Issue();
-                    $issue->importFromJira($value, $this->_em);
-                    $returned[] = $issue;
-                }
+                $returned += $this->extractData();
             } else {
                 switch ($this->getResponseCode()) {
                     case 400:
-                        $this->addError('JQL query is invalid');
+                        $this->addError('JQL query is invalid', 400);
                         break;
                     default:
                         $this->defaultError();
@@ -49,6 +45,22 @@ class searchIssue extends JiraApiCore implements JiraAPIInterface
         return $returned;
     }
 
+    public function extractData():array
+    {
+        $result = [];
+        if ($this->hasData()){
+            foreach ($this->getArray()['issues'] as $value) {
+                $issue = new Issue();
+                $issue->importFromJira($value, $this->_em);
+                $result[] = $issue;
+                if ($issue->HasUnComplateFileds()) {
+                    $this->addError('Has uncomplate fields', 1030);
+                }
+            }
+        }
+
+        return $result;
+    }
     public function addFilter (string $condition, string $type = 'AND'):self {
         return $this->addOption('jql', $condition, $type);
     }

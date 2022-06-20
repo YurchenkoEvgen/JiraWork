@@ -18,7 +18,7 @@ class getProject extends JiraApiCore implements JiraAPIInterface
         } else {
             $this->setUri('project/'.$this->id);
             if ($this->sendRequest()) {
-                $returned = new Project($this->getArray());
+                $returned = $this->extractData();
             } else {
                 switch ($this->getResponseCode()) {
                     case 404:
@@ -31,6 +31,11 @@ class getProject extends JiraApiCore implements JiraAPIInterface
         }
 
         return $returned;
+    }
+
+    public function extractData():Project
+    {
+        return new Project(($this->hasData()?$this->getArray():null));
     }
 
     public function setID(string $id) {

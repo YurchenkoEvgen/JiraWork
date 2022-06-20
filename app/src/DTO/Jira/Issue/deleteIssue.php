@@ -42,6 +42,11 @@ class deleteIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
         return $returned;
     }
 
+    public function extractData():bool
+    {
+        return $this->hasData();
+    }
+
     public function setIssue(Issue $issue):self
     {
         $this->issue = $issue;

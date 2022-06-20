@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\DTO\Jira\ConnectionInfo;
 use App\DTO\Jira\Issue\searchIssue;
+use App\DTO\Jira\IssueField\getIssueFields;
 use App\DTO\Jira\Project\searchProject;
 use App\Entity\Project;
 use App\Repository\IssueFieldRepository;
 use App\Repository\IssueRepository;
+use App\Repository\ProjectRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -51,8 +53,6 @@ class MainController extends AbstractController
             $request->getSession()->set('auth_email', $data['email']);
             $request->getSession()->set('auth_token', $data['token']);
             $request->getSession()->set('auth_url', $data['url']);
-
-
         }
 
         $con = ConnectionInfo::getByRequest($request);
@@ -103,15 +103,44 @@ class MainController extends AbstractController
             if (isset($data['project'])) {
                 $search->addFilter('project = ' . $data['project']);
             }
+
+            $issues = $search->setManagerRegistry($managerRegistry)->getData();
+
+            if ($search->hasErrors(1030)) {
+                $searchField = getIssueFields::getInterface($connection);
+                $projectRepository = new ProjectRepository($managerRegistry);
+                $fields = $searchField
+                    ->setRepository($projectRepository)
+                    ->getData();
+
+                if ($searchField->hasErrors(1010)) {
+                    $searchProjects = searchProject::getInterface($connection);
+                    $projects = $searchProjects->getData();
+                    foreach ($projects as $project) {
+                        $projectRepository->merge($project);
+                    }
+                    $projectRepository->flush();
+
+                    $fields = $searchField->extractData();
+                }
+
+                $issueFieldRepository = new IssueFieldRepository($managerRegistry);
+                foreach ($fields as $field) {
+                    $issueFieldRepository->merge($field);
+                }
+                $issueFieldRepository->flush();
+
+                $issues = $search->extractData();
+            }
+
             $issueRepository = new IssueRepository($managerRegistry);
-            $data = $search->setManagerRegistry($managerRegistry)->getData();
-            foreach ($data as $issue) {
+            foreach ($issues as $issue) {
                 $issueRepository->merge($issue);
             }
             $issueRepository->flush();
 
             return $this->render('issue/index.html.twig', [
-                'issues' => $data,
+                'issues' => $issues,
                 'data' => '',
                 'forms' => [
                     $form->createView()

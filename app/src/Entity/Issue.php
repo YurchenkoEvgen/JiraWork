@@ -27,16 +27,19 @@ class Issue
     #[ORM\Column(type: 'string', length: 255)]
     private $summary;
 
-    #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist','merge'])]
+    #[ORM\ManyToOne(targetEntity: Project::class, cascade: ['persist', 'merge'])]
     #[ORM\JoinColumn(nullable: false)]
     private $project;
 
     #[ORM\OneToMany(mappedBy: 'issue', targetEntity: IssueFieldValue::class, orphanRemoval: true)]
     private $issueFieldValues;
 
+    private bool $hasUnComplateFileds;
+
     public function __construct()
     {
         $this->issueFieldValues = new ArrayCollection();
+        $this->hasUnComplateFileds = false;
     }
 
     public function getId(): int
@@ -44,29 +47,29 @@ class Issue
         return $this->id;
     }
 
-    public function setId(int $id):self
+    public function setId(int $id): self
     {
         $this->id = $id;
         return $this;
     }
 
-    public function get_key():string
+    public function get_key(): string
     {
         return $this->_key;
     }
 
-    public function set_key(string $key):self
+    public function set_key(string $key): self
     {
         $this->_key = $key;
         return $this;
     }
 
-    public function get_self():string
+    public function get_self(): string
     {
         return $this->_self;
     }
 
-    public function set_self(string $uri):self
+    public function set_self(string $uri): self
     {
         $this->_self = $uri;
         return $this;
@@ -94,6 +97,11 @@ class Issue
         $this->project = $project;
 
         return $this;
+    }
+
+    public function HasUnComplateFileds(): bool
+    {
+        return $this->hasUnComplateFileds;
     }
 
     public function __toString(): string
@@ -129,6 +137,7 @@ class Issue
                     } else {
                         $issueField = new IssueField();
                         $issueField->setId($key);
+                        $this->hasUnComplateFileds = true;
                     }
 
                     if ($issueField->getIsArray()) {
@@ -161,9 +170,6 @@ class Issue
         ];
     }
 
-    /**
-     * @return Collection<int, IssueFieldValue>
-     */
     public function getIssueFieldValues(): Collection
     {
         return $this->issueFieldValues;

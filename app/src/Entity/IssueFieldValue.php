@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\IssueFieldValueRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Routing\Route;
 
 #[ORM\Entity(repositoryClass: IssueFieldValueRepository::class)]
 class IssueFieldValue
@@ -18,7 +17,7 @@ class IssueFieldValue
     #[ORM\JoinColumn(nullable: false)]
     private Issue $issue;
 
-    #[ORM\ManyToOne(targetEntity: IssueField::class, inversedBy: 'issueFieldValues')]
+    #[ORM\ManyToOne(targetEntity: IssueField::class, cascade: ['persist', 'merge'], inversedBy: 'issueFieldValues')]
     #[ORM\JoinColumn(nullable: false)]
     private IssueField $issueFiled;
 

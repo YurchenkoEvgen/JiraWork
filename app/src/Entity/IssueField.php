@@ -12,7 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
 class IssueField
 {
     #[ORM\Id]
-//    #[ORM\GeneratedValue]
     #[ORM\Column(type: 'string', length: 255)]
     private $id;
 
@@ -38,14 +37,19 @@ class IssueField
     private $issueFieldValues;
 
     #[ORM\Column(type: 'boolean', nullable: false)]
-    private bool $isArray = false;
+    private bool $isArray;
 
     #[ORM\Column(type: 'boolean', nullable: false)]
-    private bool $searchable = false;
+    private bool $searchable;
+
+    private bool $needProject;
 
     public function __construct()
     {
         $this->issueFieldValues = new ArrayCollection();
+        $this->needProject = false;
+        $this->searchable = false;
+        $this->isArray = false;
     }
 
     public function getId(): ?string
@@ -147,6 +151,11 @@ class IssueField
         return $this;
     }
 
+    public function getNeedProject():bool
+    {
+        return $this->needProject;
+    }
+
     public function fillFromJira(array $data, ProjectRepository $projectRepository):self
     {
         $this->type = 'string';
@@ -172,6 +181,7 @@ class IssueField
 
         if (key_exists('scope',$data) && $data['scope']['type'] == 'PROJECT') {
             $this->project = $projectRepository->find($data['scope']['project']['id']);
+            $this->needProject = is_null($this->project);
         }
 
         return $this;

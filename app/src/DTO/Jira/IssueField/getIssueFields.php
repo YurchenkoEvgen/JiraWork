@@ -16,11 +16,7 @@ class getIssueFields extends JiraApiCore implements JiraAPIInterface
         $returned = [];
         if (isset($this->projectRepository)) {
             if ($this->setUri('/field')->sendRequest()){
-                foreach ($this->getArray() as $value) {
-                    $field = new IssueField();
-                    $field->fillFromJira($value, $this->projectRepository);
-                    $returned[] = $field;
-                }
+               $returned = $this->extractData();
             } else {
                 switch ($this->getResponseCode()) {
                     default:
@@ -32,6 +28,23 @@ class getIssueFields extends JiraApiCore implements JiraAPIInterface
         }
 
         return $returned;
+    }
+
+    public function extractData():array
+    {
+        $result = [];
+        if ($this->hasData()) {
+            foreach ($this->getArray() as $value) {
+                $field = new IssueField();
+                $field->fillFromJira($value, $this->projectRepository);
+                $result[$field->getId()] = $field;
+                if ($field->getNeedProject()) {
+                    $this->addError('Need up project',1010);
+                }
+            }
+        }
+
+        return $result;
     }
 
     public function setRepository(ProjectRepository $projectRepository):self

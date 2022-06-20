@@ -45,6 +45,11 @@ The request includes an invalid transition.");
         return $returned;
     }
 
+    public function extractData():bool
+    {
+        return $this->hasData();
+    }
+
     public function setIssue(Issue $issue):self
     {
         $this->issue = $issue;
