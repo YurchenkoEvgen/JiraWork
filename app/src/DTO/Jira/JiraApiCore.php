@@ -6,7 +6,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-class JiraApiCore
+class JiraApiCore implements JiraAPIInterface
 {
     protected array $arg;
     protected string $basicUri;
@@ -22,6 +22,7 @@ class JiraApiCore
     protected bool $hasData;
 
     protected array $errors;
+    protected array $postloaders;
 
     //CREATE FUNCTION
     public function __construct(ConnectionInfo $connectionInfo)
@@ -32,7 +33,8 @@ class JiraApiCore
                 'auth_basic' => [
                     $connectionInfo->getEmail(),
                     $connectionInfo->getToken()
-                ]
+                ],
+                'query' => []
             ];
             $this->basicUri = $connectionInfo->getBasicuri();
             $this->method = Request::METHOD_GET;
@@ -42,6 +44,7 @@ class JiraApiCore
             $this->responseBody = '';
             $this->responseBodyInArray = [];
             $this->hasData = false;
+            $this->postloaders = [];
         } else {
             $this->addError('Wrong connection setting');
         }
@@ -78,6 +81,11 @@ class JiraApiCore
         return $this->hasData;
     }
 
+    public function getPostload():array
+    {
+        return $this->postloaders;
+    }
+
     //STATE
     public function isValid():bool
     {
@@ -89,8 +97,13 @@ class JiraApiCore
         return (isset($code))?array_key_exists($code,$this->getError()):count($this->getError())>0;
     }
 
+    public function hasPostload():bool
+    {
+        return count($this->getPostload()) > 0;
+    }
+
     //SETTERS
-    protected function addError($content, $code = 0):self {
+    public function addError($content, $code = 0):self {
         $this->errors[$code] = new \Error($content,$code);
         return $this;
     }
@@ -140,6 +153,19 @@ class JiraApiCore
      */
     protected function sendRequest():bool {
         if ($this->isValid()) {
+            //fix array query
+            $query = '';
+            foreach ($this->arg['query'] as $key=>$item) {
+                if (is_array($item)) {
+                    $query .= $key.'='.implode('&'.$key.'=',$item);
+                    unset($this->arg['query'][$key]);
+                }
+            }
+            if ($query != '') {
+                $separator = (strpos($this->uri,'?'))?'&':'?';
+                $this->setUri($this->uri.$separator.$query);
+            }
+
             $result = HttpClient::create()->request($this->method,$this->uri,$this->arg);
             try {
                 $this->responseCode = $result->getStatusCode();
@@ -183,5 +209,31 @@ class JiraApiCore
         $options[$name] = $value;
         $this->arg['json'] = $options;
         return $this;
+    }
+
+    public function updQuery(string $name, mixed $value):self
+    {
+        $options = $this->arg['query'];
+        $options[$name] = $value;
+        $this->arg['query'] = $options;
+        return $this;
+    }
+
+    protected function addPostload($object, ?object $filter=null):self
+    {
+        if (is_object($object) && mb_substr(get_class($object),0,10) == 'App\Entity') {
+            $this->postloaders[] = PostLoader::GetPostLoaderEntry($object,$filter);
+        }
+        return $this;
+    }
+
+    public function getData()
+    {
+        return [];
+    }
+
+    public function extractData()
+    {
+        return [];
     }
 }

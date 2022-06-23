@@ -34,12 +34,12 @@ class Issue
     #[ORM\OneToMany(mappedBy: 'issue', targetEntity: IssueFieldValue::class, orphanRemoval: true)]
     private $issueFieldValues;
 
-    private bool $hasUnComplateFileds;
+    private bool $uncomplateFileds;
 
     public function __construct()
     {
         $this->issueFieldValues = new ArrayCollection();
-        $this->hasUnComplateFileds = false;
+        $this->uncomplateFileds = false;
     }
 
     public function getId(): int
@@ -99,9 +99,9 @@ class Issue
         return $this;
     }
 
-    public function HasUnComplateFileds(): bool
+    public function getUncomplateFileds(): bool
     {
-        return $this->hasUnComplateFileds;
+        return $this->uncomplateFileds;
     }
 
     public function __toString(): string
@@ -111,6 +111,7 @@ class Issue
 
     public function importFromJira(array $data, ?ManagerRegistry $managerRegistry=null):self
     {
+        dump($data);
         if (
             empty(array_diff_key(array_fill_keys(['id','self','key','fields'],null),$data)) &&
             is_array($data['fields']) &&
@@ -137,7 +138,7 @@ class Issue
                     } else {
                         $issueField = new IssueField();
                         $issueField->setId($key);
-                        $this->hasUnComplateFileds = true;
+                        $this->uncomplateFileds = true;
                     }
 
                     if ($issueField->getIsArray()) {

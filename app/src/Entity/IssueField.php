@@ -181,7 +181,11 @@ class IssueField
 
         if (key_exists('scope',$data) && $data['scope']['type'] == 'PROJECT') {
             $this->project = $projectRepository->find($data['scope']['project']['id']);
-            $this->needProject = is_null($this->project);
+            if (is_null($this->project)) {
+                $this->needProject = true;
+                $this->project = new Project();
+                $this->project->setId($data['scope']['project']['id']);
+            }
         }
 
         return $this;

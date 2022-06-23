@@ -4,12 +4,9 @@ namespace App\Controller;
 
 use App\DTO\Jira\ConnectionInfo;
 use App\DTO\Jira\Issue\searchIssue;
-use App\DTO\Jira\IssueField\getIssueFields;
+use App\DTO\Jira\PostLoader;
 use App\DTO\Jira\Project\searchProject;
-use App\Entity\Project;
-use App\Repository\IssueFieldRepository;
 use App\Repository\IssueRepository;
-use App\Repository\ProjectRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -105,34 +102,10 @@ class MainController extends AbstractController
             }
 
             $issues = $search->setManagerRegistry($managerRegistry)->getData();
-
-            if ($search->hasErrors(1030)) {
-                $searchField = getIssueFields::getInterface($connection);
-                $projectRepository = new ProjectRepository($managerRegistry);
-                $fields = $searchField
-                    ->setRepository($projectRepository)
-                    ->getData();
-
-                if ($searchField->hasErrors(1010)) {
-                    $searchProjects = searchProject::getInterface($connection);
-                    $projects = $searchProjects->getData();
-                    foreach ($projects as $project) {
-                        $projectRepository->merge($project);
-                    }
-                    $projectRepository->flush();
-
-                    $fields = $searchField->extractData();
-                }
-
-                $issueFieldRepository = new IssueFieldRepository($managerRegistry);
-                foreach ($fields as $field) {
-                    $issueFieldRepository->merge($field);
-                }
-                $issueFieldRepository->flush();
-
-                $issues = $search->extractData();
+            if ($search->hasPostload()) {
+                $postload = new PostLoader($search,$managerRegistry,$connection);
+                $issues = $postload->doPostLoad();
             }
-
             $issueRepository = new IssueRepository($managerRegistry);
             foreach ($issues as $issue) {
                 $issueRepository->merge($issue);
@@ -158,13 +131,10 @@ class MainController extends AbstractController
     }
 
     #[Route('/test', name: 'app_test')]
-    public function testroute(IssueFieldRepository $issueFieldRepository)
+    public function testroute(Request $request)
     {
-        $pr = new Project();
-        $pr->setId('10001');
-
-        $x = $issueFieldRepository->getForProject($pr);
-        dump($x);
+        $search = searchProject::getInterface(ConnectionInfo::getByRequest($request))->byID([10000,10001]);
+        $result = $search->getData();
         return $this->render(
             'base.html.twig',
             [
@@ -172,11 +142,4 @@ class MainController extends AbstractController
             ]
         );
     }
-
-//    #[Route('/new_filter', name: 'new_filter')]
-//    public function new_filter(ManagerRegistry $managerRegistry)
-//    {
-//        $IssueFieldRepository = new IssueFieldRepository($managerRegistry);
-//        $IssueFields = $IssueFieldRepository->findAll();
-//    }
 }

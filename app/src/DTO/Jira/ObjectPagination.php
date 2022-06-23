@@ -21,7 +21,7 @@ trait ObjectPagination
             'maxResults'=>'',
             'total'=>''
         ];
-        return empty(array_diff_key($proprety,$data)) && $data['total'] != $data['maxResults'];
+        return count(array_diff_key($proprety,$data)) == 0 && $data['total'] != $data['maxResults'];
     }
 
     public function isPage():bool
@@ -34,7 +34,7 @@ trait ObjectPagination
     {
         $data = $this->getArray();
         return $this->isPaginated() &&
-            ($this->isPage())?!$data['isLast']:$data['startAt']+$data['maxResults']<$data['total'];
+            (($this->isPage())?!$data['isLast']:$data['startAt']+$data['maxResults']<$data['total']);
     }
 
     public function getPaginationUrl():string

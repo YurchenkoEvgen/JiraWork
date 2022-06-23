@@ -6,12 +6,14 @@ use App\DTO\Jira\JiraApiCore;
 use App\DTO\Jira\ObjectPagination;
 use App\Entity\Issue;
 use App\DTO\Jira\JiraAPIInterface;
+use App\Entity\IssueField;
 use Doctrine\Persistence\ManagerRegistry;
 
 class searchIssue extends JiraApiCore implements JiraAPIInterface
 {
     use ObjectPagination;
     private ManagerRegistry $_em;
+    private bool $addRelation = true;
 
     public function getData():array
     {
@@ -20,7 +22,6 @@ class searchIssue extends JiraApiCore implements JiraAPIInterface
         $this
             ->setUri('search')
             ->setMethod('POST')
-            ->addOption('maxResults',10)
         ;
         do {
             if ($this->sendRequest()) {
@@ -53,8 +54,14 @@ class searchIssue extends JiraApiCore implements JiraAPIInterface
                 $issue = new Issue();
                 $issue->importFromJira($value, $this->_em);
                 $result[] = $issue;
-                if ($issue->HasUnComplateFileds()) {
-                    $this->addError('Has uncomplate fields', 1030);
+                if ($issue->getUncomplateFileds()) {
+                    $this->addPostload(new IssueField());
+                }
+                if ($this->addRelation) {
+                    foreach ($issue->getIssueFieldValues() as $issueFieldValue) {
+//                        $this->addPostload($issueFieldValue->getValue());
+                    }
+                    $this->addRelation = false;
                 }
             }
         }
@@ -69,5 +76,10 @@ class searchIssue extends JiraApiCore implements JiraAPIInterface
     {
         $this->_em = $managerRegistry;
         return $this;
+    }
+
+    public function byID(array $ids):self
+    {
+        return $this->addFilter("id IN (".implode(',',$ids).")");
     }
 }

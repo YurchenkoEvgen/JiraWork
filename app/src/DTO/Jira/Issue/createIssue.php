@@ -3,9 +3,10 @@
 namespace App\DTO\Jira\Issue;
 
 use App\DTO\Jira\JiraApiCore;
+use App\DTO\Jira\JiraAPIInterface;
 use App\Entity\Issue;
 
-class createIssue extends JiraApiCore implements \App\DTO\Jira\JiraAPIInterface
+class createIssue extends JiraApiCore implements JiraAPIInterface
 {
     private ?Issue $issue;
 

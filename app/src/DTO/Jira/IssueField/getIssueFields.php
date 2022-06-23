@@ -39,7 +39,7 @@ class getIssueFields extends JiraApiCore implements JiraAPIInterface
                 $field->fillFromJira($value, $this->projectRepository);
                 $result[$field->getId()] = $field;
                 if ($field->getNeedProject()) {
-                    $this->addError('Need up project',1010);
+                    $this->addPostload($field->getProject());
                 }
             }
         }

@@ -1,10 +1,14 @@
 100-599: http info
-1000-1999:
-    1001 - need upd some issue
-    1010 - need upd all project
-    1020 - need upd all user
-    1021 - need upd some user
-    1030 - need upd all issueField
-    1040 - need upd all issueFieldValue
-    1045 - need upd all issueFieldValue for issue
-    1046 - need upd all issueFieldValue for issueField
+1000-1999: loadersLog
+    1000 - all projects
+    1001 - project
+    1100 - all users
+    1101 - user
+    1200 - all issueFields
+    1201 - issueField
+    1300 - all issue
+    1301 - issue
+    1305 - issues for project
+    1400 - all issueFieldValues
+    1405 - issueFieldValues for issue
+    1406 - issueFieldValues for issueField
