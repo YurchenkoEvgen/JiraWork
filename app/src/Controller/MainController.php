@@ -6,16 +6,24 @@ use App\DTO\Jira\ConnectionInfo;
 use App\DTO\Jira\Issue\searchIssue;
 use App\DTO\Jira\PostLoader;
 use App\DTO\Jira\Project\searchProject;
+use App\Entity\Project;
 use App\Repository\IssueRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
@@ -131,15 +139,89 @@ class MainController extends AbstractController
     }
 
     #[Route('/test', name: 'app_test')]
-    public function testroute(Request $request)
+    public function testroute(ManagerRegistry $managerRegistry)
     {
-        $search = searchProject::getInterface(ConnectionInfo::getByRequest($request))->byID([10000,10001]);
-        $result = $search->getData();
-        return $this->render(
-            'base.html.twig',
-            [
-                'data' => 'OK',
+        $sheet = new Spreadsheet();
+        $sheet->removeSheetByIndex(0);
+        $table = $sheet->createSheet();
+        $table->setTitle('Projects');
+        $projects = $managerRegistry->getRepository(Project::class)->findAll();
+        $table->fromArray(['ID','NAME']);
+        $table->getStyle('A1:B1')->getFont()->setBold(true);
+        $table->getStyle('A1:B1')->getBorders()->getAllBorders()
+            ->setBorderStyle(Border::BORDER_MEDIUM)->setColor(new Color(Color::COLOR_BLACK));
+        foreach ($projects as $iteam) {
+            $table->fromArray(
+                [$iteam->getID(),$iteam->getName()],
+                null,
+                $table->getCellByColumnAndRow(1,$table->getHighestDataRow()+1)->getCoordinate()
+            );
+        }
+
+//        return $this->render('base.html.twig', ['data' =>'','forms' => []]);
+        $w = new Xlsx($sheet);
+        $fn = 'text.xlsx';
+        $name = tempnam(sys_get_temp_dir(),$fn);
+        $w->save($name);
+        return $this->file($name, $fn,ResponseHeaderBag::DISPOSITION_INLINE);
+    }
+
+    #[Route('/mytime', name: 'mytime')]
+    public function mytime(Request $request)
+    {
+        $form = $this->createFormBuilder()
+            ->add('startData', DateType::class)
+            ->add('endData',DateType::class)
+            ->add('Submit', SubmitType::class)
+            ->getForm();
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $cli = HttpClient::create();
+            $arg = [
+                'json'=>[
+                    "app-key"=>"0cbc6611f5540bd0809a388dc95a615b:KpSHcl6t6EKp^Pn#D6I3",
+                    "user-key"=>"2980:(i(H(D!qo|3iEjRIS*L1",
+                    "start-date"=>$form->getData()['startData']->format('Y-m-d'),
+                    "end-date"=>$form->getData()['endData']->format('Y-m-d')
+                ]
+            ];
+            $resp = $cli->request('POST','https://pl.itcraft.co/api/client-v1/posts/list',$arg)->toArray();
+            $toexel = [['Date', 'Time', 'Task']];
+            foreach ($resp['posts'] as $iteam) {
+                $toexel[] = [
+                    $iteam['posted-on-day'],
+                    $iteam['time-taken']/60,
+                    $iteam['task']
+                ];
+            }
+            $toexel[] = [
+                'Total:',
+                array_sum(array_column($toexel,1)),
+                ''
+            ];
+
+            $sheet = new Spreadsheet();
+            $table = $sheet->getActiveSheet();
+            $table->fromArray($toexel);
+            $table->getColumnDimension('A')->setAutoSize(true);
+            $table->getColumnDimension('B')->setAutoSize(true);
+            $table->getColumnDimension('C')->setAutoSize(true);
+            $table->getStyle([1,1,6,1])->getFont()->setBold(true);
+            $table->getStyle([1,$table->getHighestDataRow(),6,$table->getHighestDataRow()])->getFont()->setBold(true);
+
+            $w = new Xlsx($sheet);
+            $fn = 'text.xlsx';
+            $name = tempnam(sys_get_temp_dir(),$fn);
+            $w->save($name);
+            return $this->file($name, $fn,ResponseHeaderBag::DISPOSITION_INLINE);
+        }
+
+        return $this->render('base.html.twig', [
+            'data' =>'',
+            'forms' => [
+                $form->createView()
             ]
-        );
+        ]);
     }
 }

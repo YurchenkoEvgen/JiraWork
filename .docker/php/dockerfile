@@ -24,6 +24,11 @@ RUN echo "apc.enable=1" > /usr/local/etc/php/php.ini
 #PHP OPcache
 RUN docker-php-ext-install opcache
 
+#PHP GD, ZIP for phpoffice
+RUN apt-get install -y libzip-dev libpng-dev
+RUN docker-php-ext-install zip
+RUN docker-php-ext-install gd
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer
 RUN composer --version
