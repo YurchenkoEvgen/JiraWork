@@ -6,21 +6,29 @@ use App\DTO\Jira\ConnectionInfo;
 use App\DTO\Jira\Issue\searchIssue;
 use App\DTO\Jira\PostLoader;
 use App\DTO\Jira\Project\searchProject;
-use App\Entity\Project;
 use App\Repository\IssueRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+use PhpOffice\PhpSpreadsheet\Chart\Layout;
+use PhpOffice\PhpSpreadsheet\Chart\Legend;
+use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+use PhpOffice\PhpSpreadsheet\Chart\Title;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Console\Command\DumpCompletionCommand;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -141,28 +149,62 @@ class MainController extends AbstractController
     #[Route('/test', name: 'app_test')]
     public function testroute(ManagerRegistry $managerRegistry)
     {
-        $sheet = new Spreadsheet();
-        $sheet->removeSheetByIndex(0);
-        $table = $sheet->createSheet();
-        $table->setTitle('Projects');
-        $projects = $managerRegistry->getRepository(Project::class)->findAll();
-        $table->fromArray(['ID','NAME']);
-        $table->getStyle('A1:B1')->getFont()->setBold(true);
-        $table->getStyle('A1:B1')->getBorders()->getAllBorders()
-            ->setBorderStyle(Border::BORDER_MEDIUM)->setColor(new Color(Color::COLOR_BLACK));
-        foreach ($projects as $iteam) {
-            $table->fromArray(
-                [$iteam->getID(),$iteam->getName()],
-                null,
-                $table->getCellByColumnAndRow(1,$table->getHighestDataRow()+1)->getCoordinate()
-            );
-        }
+        $spreadsheet = new Spreadsheet();
+        $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet->fromArray(
+            [
+                ['', 2010, 2011, 2012],
+                ['Q1', 12, 15, 21],
+                ['Q2', 56, 73, 86],
+                ['Q3', 52, 61, 69],
+                ['Q4', 30, 32, 0],
+            ]
+        );
 
-//        return $this->render('base.html.twig', ['data' =>'','forms' => []]);
-        $w = new Xlsx($sheet);
+        $dataSeriesLabels1 = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$C$1', null,1)
+        ];
+        $xAxisTickValues1 = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Worksheet!$A$2:$A$5', null, 4), // Q1 to Q4
+        ];
+        $dataSeriesValues1 = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Worksheet!$C$2:$C$5', null, 4),
+        ];
+        $series1 = new DataSeries(
+            DataSeries::TYPE_PIECHART, // plotType
+            null, // plotGrouping (Pie charts don't have any grouping)
+            range(0, count($dataSeriesValues1) - 1), // plotOrder
+            $dataSeriesLabels1, // plotLabel
+            $xAxisTickValues1, // plotCategory
+            $dataSeriesValues1          // plotValues
+        );
+
+        $layout1 = new Layout();
+        $layout1->setShowVal(true);
+        $layout1->setShowPercent(true);
+        $plotArea1 = new PlotArea($layout1, [$series1]);
+        $legend1 = new Legend();
+        $title1 = new Title('Test Pie Chart');
+
+        $chart1 = new Chart(
+            'chart1', // name
+            $title1, // title
+            $legend1, // legend
+            $plotArea1, // plotArea
+            true, // plotVisibleOnly
+            DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+            null, // xAxisLabel
+            null   // yAxisLabel - Pie charts don't have a Y-Axis
+        );
+
+        $chart1->setTopLeftPosition('A7');
+        $chart1->setBottomRightPosition('H20');
+        $worksheet->addChart($chart1);
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->setIncludeCharts(true);
         $fn = 'text.xlsx';
         $name = tempnam(sys_get_temp_dir(),$fn);
-        $w->save($name);
+        $writer->save($name);
         return $this->file($name, $fn,ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
@@ -213,8 +255,87 @@ class MainController extends AbstractController
             $w = new Xlsx($sheet);
             $fn = 'text.xlsx';
             $name = tempnam(sys_get_temp_dir(),$fn);
+            $w->setIncludeCharts(true)->save($name);
+            return $this->file($name, $fn,ResponseHeaderBag::DISPOSITION_INLINE);
+        }
+
+        return $this->render('base.html.twig', [
+            'data' =>'',
+            'forms' => [
+                $form->createView()
+            ]
+        ]);
+    }
+
+    #[Route('/testup', name: 'testup')]
+    public function testup(Request $request)
+    {
+        $form= $this->createFormBuilder()
+            ->add('file', FileType::class,[
+                'attr'=>['accept'=>'.xlsx,.xls,.typ'],
+                'constraints'=>new File(mimeTypes: [
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.oasis.opendocument.spreadsheet'
+                ])
+            ])
+            ->add('upd', SubmitType::class)
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->get('file')->getData()->getPathname();
+
+            $sheet = IOFactory::load($data);
+            $worksheet = $sheet->getSheet(1);
+
+            $dataSeriesLabels1 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pivot!$A$1', null,1)
+            ];
+            $xAxisTickValues1 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Pivot!$A$2:$A$6', null, 5), // Q1 to Q4
+            ];
+            $dataSeriesValues1 = [
+                new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Pivot!$B$1:$B$6', null, 5),
+            ];
+            $series1 = new DataSeries(
+                DataSeries::TYPE_PIECHART, // plotType
+                null, // plotGrouping (Pie charts don't have any grouping)
+                range(0, count($dataSeriesValues1) - 1), // plotOrder
+                $dataSeriesLabels1, // plotLabel
+                $xAxisTickValues1, // plotCategory
+                $dataSeriesValues1          // plotValues
+            );
+
+            $layout1 = new Layout();
+            $layout1->setShowVal(true);
+            $layout1->setShowPercent(true);
+            $plotArea1 = new PlotArea($layout1, [$series1]);
+            $legend1 = new Legend();
+            $title1 = new Title('Test Pie Chart');
+
+            $chart1 = new Chart(
+                'chart1', // name
+                $title1, // title
+                $legend1, // legend
+                $plotArea1, // plotArea
+                true, // plotVisibleOnly
+                DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+                null, // xAxisLabel
+                null   // yAxisLabel - Pie charts don't have a Y-Axis
+            );
+
+            $chart1->setTopLeftPosition('D7');
+            $chart1->setBottomRightPosition('K20');
+            $worksheet->addChart($chart1);
+
+            $w = new Xlsx($sheet);
+            $w->setIncludeCharts(true);
+            $fn = 'text.xlsx';
+            $name = tempnam(sys_get_temp_dir(),$fn);
+            dump($name);
             $w->save($name);
             return $this->file($name, $fn,ResponseHeaderBag::DISPOSITION_INLINE);
+
         }
 
         return $this->render('base.html.twig', [

@@ -27,8 +27,8 @@
                 <td>{{ user.displayName }}</td>
                 <td>{{ user.active ? 'Yes' : 'No' }}</td>
                 <td>
-                    <a href="{{ path('app_user_show', {'accountId': user.accountId}) }}">show</a>
-                    <a href="{{ path('app_user_edit', {'accountId': user.accountId}) }}">edit</a>
+                    <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
+                    <a href="{{ path('app_user_edit', {'accountId': user.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}

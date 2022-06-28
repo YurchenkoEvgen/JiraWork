@@ -27,6 +27,7 @@ class JiraApiCore implements JiraAPIInterface
     //CREATE FUNCTION
     public function __construct(ConnectionInfo $connectionInfo)
     {
+        $this->basicUri = '';
         $this->isValid = $connectionInfo->isValid();
         if ($this->isValid) {
             $this->arg = [
@@ -37,17 +38,18 @@ class JiraApiCore implements JiraAPIInterface
                 'query' => []
             ];
             $this->basicUri = $connectionInfo->getBasicuri();
-            $this->method = Request::METHOD_GET;
-            $this->validcodes = ['200'];
-            $this->errors = [];
-            $this->responseCode = 0;
-            $this->responseBody = '';
-            $this->responseBodyInArray = [];
-            $this->hasData = false;
-            $this->postloaders = [];
+
         } else {
             $this->addError('Wrong connection setting');
         }
+        $this->method = Request::METHOD_GET;
+        $this->validcodes = ['200'];
+        $this->errors = [];
+        $this->responseCode = 0;
+        $this->responseBody = '';
+        $this->responseBodyInArray = [];
+        $this->hasData = false;
+        $this->postloaders = [];
     }
 
     public static function getInterface(ConnectionInfo $connectionInfo)

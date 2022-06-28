@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AppUser{% endblock %}
+
+{% block body %}
+    <h1>AppUser</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ app_user.id }}</td>
+            </tr>
+            <tr>
+                <th>Username</th>
+                <td>{{ app_user.username }}</td>
+            </tr>
+            <tr>
+                <th>Roles</th>
+                <td>{{ app_user.roles ? app_user.roles|json_encode : '' }}</td>
+            </tr>
+
+            <tr>
+                <th>Options:</th>
+            </tr>
+
+            {% for setting in app_user.appUserSettings %}
+                <tr>
+                    <th>setting.setting</th>
+                    <td>setting.value</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_appuser_index') }}">back to list</a>
+
+    <a href="{{ path('app_appuser_edit', {'id': app_user.id}) }}">edit</a>
+
+    {{ include('app_user/_delete_form.html.twig') }}
+{% endblock %}
