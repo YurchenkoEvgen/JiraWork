@@ -132,7 +132,6 @@ class AppUser implements UserInterface, PasswordAuthenticatedUserInterface
                 $appUserSetting->setAppUser(null);
             }
         }
-
         return $this;
     }
 }

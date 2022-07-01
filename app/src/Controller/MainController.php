@@ -41,7 +41,7 @@ class MainController extends AbstractController
     {
 
         $form = $this->createFormBuilder()->getForm();
-        return $this->render('base.html.twig', [
+        return $this->render('@template/base.html.twig', [
             'forms' => array($form->createView()),
             'data' => 'OK'
         ]);
@@ -74,7 +74,7 @@ class MainController extends AbstractController
             $request->getSession()->remove('authredirecturi');
             return $this->redirect($authredirecturi);
         }
-        return $this->render('base.html.twig', [
+        return $this->render('@template/base.html.twig', [
             'forms' => array(
                 $form->createView()
             ),

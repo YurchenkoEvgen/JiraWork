@@ -52,7 +52,7 @@ class JiraApiCore implements JiraAPIInterface
         $this->postloaders = [];
     }
 
-    public static function getInterface(ConnectionInfo $connectionInfo)
+    public static function getInterface(ConnectionInfo $connectionInfo):JiraAPIInterface
     {
         return new static($connectionInfo);
     }
